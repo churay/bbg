@@ -1,9 +1,11 @@
 function love.run()
+  math.randomseed( os.time() )
+
   if love.load then love.load( arg ) end
+  if love.timer then love.timer.step() end
 
   local timedelta = 0
   local isrunning = true
-
   while isrunning do
     if love.event then
       love.event.pump()
@@ -20,10 +22,13 @@ function love.run()
     end
 
     if love.update then love.update( timedelta ) end
-    if love.graphics and love.draw then love.draw() end
+    if love.window and love.graphics and love.window.isCreated() then
+      love.graphics.clear()
+      love.draw()
+      love.graphics.present()
+    end
 
     if love.timer then love.timer.sleep( 0.001 ) end
-    if love.graphics then love.graphics.present() end
   end
 end
 
