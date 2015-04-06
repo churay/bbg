@@ -29,10 +29,10 @@ local function Type( ParentType )
   return NewType
 end
 
-ObjectType = Type()
+local ObjectType = Type()
 ObjectType._init = function( self, ... ) end
 
-function Class( ParentType )
+local function Class( ParentType )
   local ParentType = ParentType or ObjectType
   local ChildType = Type( ParentType )
 
