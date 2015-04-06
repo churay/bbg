@@ -47,7 +47,6 @@ set ttimeout
 set ttimeoutlen=200
 set wildignore=*.o,*.obj,*.exe,*.so,*.dll,*.pyc,.svn,.hg,.bzr,.git
 set wildmenu
-set window=42
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
@@ -56,7 +55,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +32 bbg/Class.lua
+badd +4 bbg/Class.lua
 badd +1 spec/ClassSpec.lua
 badd +44 ~/documents/notes/examples/lua/module/spec/QueueSpec.lua
 badd +23 Makefile
@@ -294,12 +293,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 45 - ((18 * winheight(0) + 9) / 19)
+let s:l = 35 - ((10 * winheight(0) + 9) / 19)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-45
-normal! 022|
+35
+normal! 0
 wincmd w
 argglobal
 edit spec/ClassSpec.lua
@@ -405,12 +404,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 79 - ((9 * winheight(0) + 10) / 20)
+let s:l = 79 - ((4 * winheight(0) + 10) / 20)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 79
-normal! 05|
+normal! 037|
 wincmd w
 3wincmd w
 exe 'vert 1resize ' . ((&columns * 83 + 83) / 167)
