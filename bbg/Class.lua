@@ -1,40 +1,23 @@
 local function Type( ParentType )
   local NewType = {}
-
-  -- TODO(JRC): Improve this so that it's less ugly.
-  if ParentType == nil then NewType.new = function( self, ... ) end end
+  NewType.__index = NewType
   NewType.super = ParentType
 
-  -- TODO(JRC): Uncomment this section once this the functions is debugged.
-  --[[
-  NewType.istype = function( self, SomeType )
-    return SomeType == NewType
-  end
-  NewType.isa = function( self, SomeType )
-    if SomeType == NewType then
-      return true
-    elseif self.super then
-      return self.super.isa( self, SomeType )
-    else
-      return false
-    end
-  end
-  ]]--
-
-  NewType.__index = NewType
-  NewType.__call = function( self, ... )
-    local object = {}
-    setmetatable( object, NewType )
-    object:new( unpack(arg) )
+  local NewTypeMT = {}
+  NewTypeMT.__index = ParentType
+  NewTypeMT.__call = function( ObjType, ... )
+    local object = setmetatable( {}, NewType )
+    object:new( ... )
     return object
   end
 
-  setmetatable( NewType, ParentType )
+  setmetatable( NewType, NewTypeMT )
 
   return NewType
 end
 
-local ObjectType = Type()
+ObjectType = Type()
+ObjectType.new = function( self, ... ) end
 
 function Class( ParentType )
   local ParentType = ParentType or ObjectType
