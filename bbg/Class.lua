@@ -1,16 +1,17 @@
 local function Type( ParentType )
   local NewType = {}
   NewType.__index = NewType
-  NewType.super = ParentType
+  NewType._super = ParentType
+  NewType._type = NewType
 
   NewType.istype = function( self, SomeType )
-    return SomeType == NewType
+    return self._type == SomeType
   end
   NewType.isa = function( self, SomeType )
-    local CurrType = NewType
+    local CurrType = self._type
     while CurrType ~= nil do
       if CurrType == SomeType then return true end
-      CurrType = CurrType.super
+      CurrType = CurrType._super
     end
     return false
   end
@@ -19,7 +20,7 @@ local function Type( ParentType )
   NewTypeMT.__index = ParentType
   NewTypeMT.__call = function( ObjType, ... )
     local object = setmetatable( {}, NewType )
-    object:new( ... )
+    object:_init( ... )
     return object
   end
 
@@ -29,7 +30,7 @@ local function Type( ParentType )
 end
 
 ObjectType = Type()
-ObjectType.new = function( self, ... ) end
+ObjectType._init = function( self, ... ) end
 
 function Class( ParentType )
   local ParentType = ParentType or ObjectType

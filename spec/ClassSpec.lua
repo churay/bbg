@@ -4,7 +4,7 @@ describe( "Class", function()
   --[[ Testing Constants ]]--
 
   -- The names of all the functions defined in the test classes.
-  local CLASS_FUNCTIONS = { "new", "getval", "tostr" }
+  local CLASS_FUNCTIONS = { "_init", "getval", "tostr" }
 
   -- The values initialized to instances of the different test class types.
   local BASE_VALUE = 1
@@ -44,12 +44,12 @@ describe( "Class", function()
 
   before_each( function()
     BaseClass = Class()
-    BaseClass.new = function( self ) self.testval = BASE_VALUE end
+    BaseClass._init = function( self ) self.testval = BASE_VALUE end
     BaseClass.getval = function( self ) return self.testval end
     BaseClass.tostr = function( self ) return BASE_NAME end
 
     OverrideClass = Class( BaseClass )
-    OverrideClass.new = function( self ) self.testval = OVERRIDE_VALUE end
+    OverrideClass._init = function( self ) self.testval = OVERRIDE_VALUE end
     OverrideClass.getval = function( self ) return self.testval + 1 end
     OverrideClass.tostr = function( self ) return OVERRIDE_NAME end
 
@@ -104,10 +104,10 @@ describe( "Class", function()
   end )
 
   it( "properly sets the 'super' field to the type's parent type", function()
-    assert.is.truthy( BaseClass.super )
-    assert.are.equal( BaseClass, OverrideClass.super )
-    assert.are.equal( BaseClass, InheritClass.super )
-    assert.are.equal( InheritClass, DescendentClass.super )
+    assert.is.truthy( BaseClass._super )
+    assert.are.equal( BaseClass, OverrideClass._super )
+    assert.are.equal( BaseClass, InheritClass._super )
+    assert.are.equal( InheritClass, DescendentClass._super )
   end )
 
   it( "distributes all nonoverridden functions to child types", function()
@@ -115,7 +115,7 @@ describe( "Class", function()
       assert.are.equal( BaseClass[fxn], InheritClass[fxn] )
     end
 
-    assert.are.equal( InheritClass.new, DescendentClass.new )
+    assert.are.equal( InheritClass._init, DescendentClass._init )
     assert.are.equal( InheritClass.getval, DescendentClass.getval )
   end )
 
