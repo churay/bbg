@@ -3,6 +3,18 @@ local function Type( ParentType )
   NewType.__index = NewType
   NewType.super = ParentType
 
+  NewType.istype = function( self, SomeType )
+    return SomeType == NewType
+  end
+  NewType.isa = function( self, SomeType )
+    local CurrType = NewType
+    while CurrType ~= nil do
+      if CurrType == SomeType then return true end
+      CurrType = CurrType.super
+    end
+    return false
+  end
+
   local NewTypeMT = {}
   NewTypeMT.__index = ParentType
   NewTypeMT.__call = function( ObjType, ... )
