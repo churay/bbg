@@ -48,11 +48,9 @@ function Vector.dot( self, vector )
   return self._x * vector._x + self._y * vector._y
 end
 
-function Vector.angleWith( self, vector )
-  -- 0 == a.angleWith(b)
-  -- a . b == |a||b|cos0
-  -- 0 == acos( a . b / |a||b| )
-  return 0.0
+function Vector.angleto( self, vector )
+  -- a.b = |a||b|cos(t) ==> t = acos( a.b / |a||b| )
+  return math.acos( self:dot(vector) / (self:magnitude()*vector:magnitude()) )
 end
 
 function Vector.magnitude( self )
@@ -66,8 +64,9 @@ function Vector.normalize( self )
   self._y = self._y / magnitude
 end
 
---[[ Private Functions ]]--
+--[[ Accessor Functions ]]--
 
-
+function Vector.getx( self ) return self._x end
+function Vector.gety( self ) return self._y end
 
 return Vector

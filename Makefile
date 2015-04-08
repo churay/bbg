@@ -3,7 +3,7 @@
 LUA_PROJ_RUNNER = love
 LUA_PROJ_RUNNER_FLAGS =
 LUA_TESTER = busted
-LUA_TESTER_FLAGS = --lpath='$(LUA_DIR)/?.lua;$(PROJ_DIR)/?/init.lua'
+LUA_TESTER_FLAGS = --lpath='$(LUA_DIR)/?.lua;$(PROJ_DIR)/?/init.lua;$(TEST_DIR)/?.lua'
 
 ### Project Files and Directories ###
 
