@@ -11,7 +11,7 @@ function Graph._init( self )
   self._edges = { labels = {}, outgoing = {}, incoming = {} }
 
   -- TODO(JRC): Remove this somehow (create utility generate id function?)!
-  self._nextvid = 0
+  self._nextvid = 1
 end
 
 --[[ Public Functions ]]--
@@ -24,7 +24,7 @@ function Graph.addvertex( self, vlabel )
   self._edges.outgoing[vid] = {}
   self._edges.incoming[vid] = {}
 
-  return GraphVertex( self, vid )
+  return Graph.Vertex( self, vid )
 end
 
 function Graph.addedge( self, srcvertex, dstvertex, elabel )
@@ -38,7 +38,7 @@ function Graph.addedge( self, srcvertex, dstvertex, elabel )
     self._edges.outgoing[srcvid][dstvid] = true
     self._edges.incoming[dstvid][srcvid] = true
 
-    return GraphEdge( self, srcvid, dstvid )
+    return Graph.Edge( self, srcvid, dstvid )
   end
 end
 
@@ -74,7 +74,7 @@ end
 function Graph.findedge( self, ... )
   local edge = nil
   if arg.n == 1 then edge = arg[1]
-  elseif arg.n == 2 then edge = GraphEdge( self, arg[1]._vid, arg[2]._vid )
+  elseif arg.n == 2 then edge = Graph.Edge( self, arg[1]._vid, arg[2]._vid )
   else edge = nil end
 
   if edge and self == edge._graph and
@@ -94,57 +94,66 @@ end
 
 --[[ Private Classes ]]--
 
-local GraphVertex = Class()
+Graph.Vertex = Class()
 
-function GraphVertex._init( self, graph, vid )
+function Graph.Vertex._init( self, graph, vid )
   self._graph = graph
   self._vid = vid
 end
 
-function GraphVertex.getlabel( self )
+function Graph.Vertex.__eq( self, vertex )
+  return self._graph == vertex._graph and self._vid == vertex._vid
+end
+
+function Graph.Vertex.getlabel( self )
   return self._graph._vertices[self._vid] 
 end
 
-function GraphVertex.getoutedges( self )
+function Graph.Vertex.getoutedges( self )
   local outedges = {}
 
   for dstvid in self._graph.outgoing[self._vid] do
-    local dstvertex = GraphVertex( self._graph, dstvid )
+    local dstvertex = Graph.Vertex( self._graph, dstvid )
     table.insert( outedges, self._graph:findedge(self, dstvertex) )
   end
 
   return outedges
 end
 
-function GraphVertex.getinedges( self )
+function Graph.Vertex.getinedges( self )
   local inedges = {}
 
   for dstvid in self._graph.incoming[self._vid] do
-    local dstvertex = GraphVertex( self._graph, dstvid )
+    local dstvertex = Graph.Vertex( self._graph, dstvid )
     table.insert( inedges, self._graph:findedge(dstvertex, self) )
   end
 
   return inedges
 end
 
-local GraphEdge = Class()
+Graph.Edge = Class()
 
-function GraphEdge._init( self, graph, srcvid, dstvid )
+function Graph.Edge._init( self, graph, srcvid, dstvid )
   self._graph = graph
   self._srcvid = srcvid
   self._dstvid = dstvid
 end
 
-function GraphEdge.getlabel( self )
+function Graph.Edge.__eq( self, edge )
+  return self._graph == edge._graph and self._srcvid == edge._srcvid and 
+    self._dstvid == edge._dstvid
+end
+
+function Graph.Edge.getlabel( self )
   return self._graph._edges.labels[self._srcvid][self._dstvid]
 end
 
-function GraphEdge.getsource( self )
-  return self._graph:findvertex( GraphVertex(self._graph, self._srcvid) )
+function Graph.Edge.getsource( self )
+  return self._graph:findvertex( Graph.Vertex(self._graph, self._srcvid) )
 end
 
-function GraphEdge.getdestination( self )
-  return self._graph:findvertex( GraphVertex(self._graph, self._dstvid) )
+function Graph.Edge.getdestination( self )
+  return self._graph:findvertex( Graph.Vertex(self._graph, self._dstvid) )
 end
 
 return Graph
