@@ -55,12 +55,12 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +42 bbg/Class.lua
+badd +6 bbg/Class.lua
 badd +10 bbg/Bubble.lua
 badd +1 bbg/Vector.lua
-badd +0 bbg/Graph.lua
-badd +84 spec/ClassSpec.lua
-badd +0 spec/GraphSpec.lua
+badd +56 bbg/Graph.lua
+badd +83 spec/ClassSpec.lua
+badd +1 spec/GraphSpec.lua
 args bbg/Class.lua
 edit bbg/Class.lua
 set splitbelow splitright
@@ -288,12 +288,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 56 - ((24 * winheight(0) + 21) / 42)
+let s:l = 107 - ((40 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-56
-normal! 02|
+107
+normal! 0
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 84 + 85) / 170)
