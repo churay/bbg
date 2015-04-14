@@ -58,7 +58,7 @@ set shortmess=aoO
 badd +6 bbg/Class.lua
 badd +10 bbg/Bubble.lua
 badd +1 bbg/Vector.lua
-badd +56 bbg/Graph.lua
+badd +107 bbg/Graph.lua
 badd +83 spec/ClassSpec.lua
 badd +1 spec/GraphSpec.lua
 args bbg/Class.lua
@@ -288,14 +288,13 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 107 - ((40 * winheight(0) + 21) / 42)
+let s:l = 83 - ((34 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-107
-normal! 0
+83
+normal! 03|
 wincmd w
-2wincmd w
 exe 'vert 1resize ' . ((&columns * 84 + 85) / 170)
 exe 'vert 2resize ' . ((&columns * 85 + 85) / 170)
 tabedit bbg/Graph.lua
@@ -413,11 +412,11 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 21) / 42)
+let s:l = 183 - ((37 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+183
 normal! 0
 wincmd w
 argglobal
@@ -524,17 +523,17 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 21) / 42)
+let s:l = 107 - ((41 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+107
+normal! 05|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 84 + 85) / 170)
 exe 'vert 2resize ' . ((&columns * 85 + 85) / 170)
-tabnext 1
+tabnext 2
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
 endif

@@ -1,4 +1,5 @@
 local Class = require( "Class" )
+local Utility = require( "Utility" )
 local Graph = Class()
 
 -- TODO(JRC): It would probably be good to have an option to shallow or deep
@@ -73,6 +74,8 @@ end
 
 function Graph.findedge( self, ... )
   local edge = nil
+
+  local arg = Utility.packvargs( ... )
   if arg.n == 1 then edge = arg[1]
   elseif arg.n == 2 then edge = Graph.Edge( self, arg[1]._vid, arg[2]._vid )
   else edge = nil end
@@ -82,6 +85,32 @@ function Graph.findedge( self, ... )
     self._edges.outgoing[edge._srcvid][edge._dstvid] ~= nil then
     return edge
   end
+end
+
+function Graph.queryvertices( self, queryfxn )
+  local queriedvertices = {}
+  local queryfxn = queryfxn or function( v ) return true end
+
+  for vid, vlabel in pairs( self._vertices ) do
+    local vertex = Graph.Vertex( self, vid )
+    if queryfxn( vertex ) then table.insert( queriedvertices, vertex ) end
+  end
+
+  return queriedvertices
+end
+
+function Graph.queryedges( self, queryfxn )
+  local queriededges = {}
+  local queryfxn = queryfxn or function( e ) return true end
+
+  for srcvid, srcverttoedges in pairs( self._edges.labels ) do
+    for dstvid, elabel in pairs( srcverttoedges ) do
+      local edge = Graph.Edge( self, srcvid, dstvid )
+      if queryfxn( edge ) then table.insert( queriededges, edge ) end
+    end
+  end
+
+  return queriededges
 end
 
 --[[ Private Functions ]]--
