@@ -11,7 +11,6 @@ function Graph._init( self )
   self._vertices = {}
   self._edges = { labels = {}, outgoing = {}, incoming = {} }
 
-  -- TODO(JRC): Remove this somehow (create utility generate id function?)!
   self._nextvid = 1
 end
 
@@ -28,6 +27,7 @@ function Graph.addvertex( self, vlabel )
   return Graph.Vertex( self, vid )
 end
 
+-- TODO(JRC): Add an option for adding bidirectional edges.
 function Graph.addedge( self, srcvertex, dstvertex, elabel )
   if self:findvertex( srcvertex ) and self:findvertex( dstvertex ) then
     if self:findedge( srcvertex, dstvertex ) then

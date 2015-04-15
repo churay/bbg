@@ -83,11 +83,24 @@ describe( "Graph", function()
   end )
 
   it( "doesn't allow adding edges with invalid start/end vertices", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    local remotevertices = testaltgraph:queryvertices()
+    assert.falsy( testgraph:addedge(testvertices[1], remotevertices[2]) )
+    assert.falsy( testgraph:addedge(remotevertices[1], testvertices[2]) )
+
+    assert.are.equivalentlists( testedges, testgraph:queryedges() )
   end )
 
   it( "overwrites existing edges on edge readd", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    local overwriteedge = testgraph:queryedges()[1]
+    local overwritesrc = overwriteedge:getsource()
+    local overwritedst = overwriteedge:getdestination()
+
+    local newelabel = "-" .. overwriteedge:getlabel() .. "-"
+    local newedge = testgraph:addedge( overwritesrc, overwritedst, newelabel )
+
+    assert.are.equal( newelabel, newedge:getlabel() )
+    assert.are.equal( overwritesrc, newedge:getsource() )
+    assert.are.equal( overwritedst, newedge:getdestination() )
   end )
 
   it( "properly removes vertices from the data structure", function()

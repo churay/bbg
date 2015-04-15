@@ -62,7 +62,7 @@ badd +107 bbg/Graph.lua
 badd +83 spec/ClassSpec.lua
 badd +1 spec/GraphSpec.lua
 badd +46 spec/bustedext.lua
-badd +0 spec/VectorSpec.lua
+badd +1 spec/VectorSpec.lua
 args bbg/Class.lua
 edit bbg/Class.lua
 set splitbelow splitright
@@ -290,12 +290,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 83 - ((0 * winheight(0) + 21) / 42)
+let s:l = 62 - ((0 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-83
-normal! 03|
+62
+normal! 02|
 wincmd w
 exe 'vert 1resize ' . ((&columns * 84 + 85) / 170)
 exe 'vert 2resize ' . ((&columns * 85 + 85) / 170)
@@ -414,12 +414,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 21) / 42)
+let s:l = 188 - ((41 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 011|
+188
+normal! 07|
 wincmd w
 argglobal
 edit spec/GraphSpec.lua
@@ -525,12 +525,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 74 - ((31 * winheight(0) + 21) / 42)
+let s:l = 115 - ((30 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-74
-normal! 0
+115
+normal! 07|
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 84 + 85) / 170)
