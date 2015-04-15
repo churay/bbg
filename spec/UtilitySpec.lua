@@ -1,22 +1,6 @@
 local Utility = require( "bbg.Utility" )
 
 describe( "Utility", function()
-  --[[ Testing Constants ]]--
-
-
-  --[[ Testing Variables ]]--
-
-
-  --[[ Set Up / Tear Down Functions ]]--
-
-  before_each( function()
-    
-  end )
-
-  after_each( function()
-    
-  end )
-
   --[[ Testing Functions ]]--
 
   it( "supports variable arguments packing", function()

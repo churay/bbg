@@ -1,3 +1,4 @@
+require( "bustedext" )
 local Graph = require( "bbg.Graph" )
 
 describe( "Graph", function()
@@ -6,6 +7,7 @@ describe( "Graph", function()
   local testgraph = nil
   local testvertices = nil
   local testedges = nil
+  local testdiffgraph = nil
 
   --[[ Set Up / Tear Down Functions ]]--
 
@@ -29,17 +31,25 @@ describe( "Graph", function()
     testedges = {}
     local edgepairs = { {2, 3}, {2, 4}, {3, 5}, {4, 5}, {3, 4} }
     for _, ep in ipairs( edgepairs ) do
-      -- TODO(JRC): Add labels to each of the edges that correspond to the
-      -- vertices that they join.
-      local edge = testgraph:addedge( testvertices[ep[1]], testvertices[ep[2]] )
+      local edge = testgraph:addedge( testvertices[ep[1]], testvertices[ep[2]],
+        tostring(ep[1]) .. ">" .. tostring(ep[2])  )
       table.insert( testedges, edge )
     end
+
+    -- Test AltGraph Diagram:
+    --
+    --   1---------->2
+    --
+    testaltgraph = Graph()
+    testaltgraph:addedge( testaltgraph:addvertex("1"),
+      testaltgraph:addvertex("2"), "1>2" )
   end )
 
   after_each( function()
     testgraph = nil
     testvertices = nil
     testedges = nil
+    testaltgraph = nil
   end )
 
   --[[ Testing Functions ]]--
@@ -47,32 +57,32 @@ describe( "Graph", function()
   it( "constructs instances that are initially empty", function()
     local emptygraph = Graph()
 
-    assert.are.equal( 0, #emptygraph:queryvertices() )
-    assert.are.equal( 0, #emptygraph:queryedges() )
-  end )
-
-  it( "returns only existing vertices queried via 'findvertex'", function()
-    pending( "TODO(JRC): Implement this test case!" )
-  end )
-
-  it( "returns only existing edges queried via 'findedge'", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    assert.are.equivalentlists( {}, emptygraph:queryvertices() )
+    assert.are.equivalentlists( {}, emptygraph:queryedges() )
   end )
 
   it( "properly adds vertices to the data structure", function()
+    assert.are.equivalentlists( testvertices, testgraph:queryvertices() )
+
     for vertexidx, vertex in ipairs( testvertices ) do
       assert.is_true( vertex:isa(Graph.Vertex) )
       assert.are.equal( tostring(vertexidx), vertex:getlabel() )
     end
-
-    assert.are.equal( #testvertices, #testgraph:queryvertices() )
   end )
 
   it( "properly adds new edges to the data structure", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    assert.are.equivalentlists( testedges, testgraph:queryedges() )
+
+    for edgeidx, edge in ipairs( testedges ) do
+      assert.is_true( edge:isa(Graph.Edge) )
+      assert.are.equal(
+        edge:getsource():getlabel() .. ">" .. edge:getdestination():getlabel(),
+        edge:getlabel()
+      )
+    end
   end )
 
-  it( "only allows adding edges with valid start/end vertices", function()
+  it( "doesn't allow adding edges with invalid start/end vertices", function()
     pending( "TODO(JRC): Implement this test case!" )
   end )
 
@@ -90,6 +100,37 @@ describe( "Graph", function()
 
   it( "properly removes edges from the data structure", function()
     pending( "TODO(JRC): Implement this test case!" )
+  end )
+
+  it( "returns only existing vertices queried via 'findvertex'", function()
+    for _, vertex in ipairs( testvertices ) do
+      assert.are.equal( vertex, testgraph:findvertex(vertex) )
+    end
+
+    local remotevertex = testaltgraph:queryvertices()[1]
+    assert.falsy( testgraph:findvertex(remotevertex) )
+  end )
+
+  it( "returns only existing edges queried via 'findedge'", function()
+    for _, edge in ipairs( testedges ) do
+      assert.are.equal( edge, testgraph:findedge(edge) )
+    end
+
+    local remoteedge = testaltgraph:queryedges()[1]
+    assert.falsy( testgraph:findedge(remoteedge) )
+  end )
+
+  it( "supports 'findedge' edge queries using endpoint vertices", function()
+    for _, edge in ipairs( testedges ) do
+      local edgesrc = edge:getsource()
+      local edgedst = edge:getdestination()
+      assert.are.equal( edge, testgraph:findedge(edgesrc, edgedst) )
+    end
+
+    local remotevertices = testaltgraph:queryvertices()
+    assert.falsy( testgraph:findedge(testvertices[1], testvertices[2]) )
+    assert.falsy( testgraph:findedge(testvertices[1], remotevertices[2]) )
+    assert.falsy( testgraph:findedge(remotevertices[1], remotevertices[2]) )
   end )
 
   -- TODO(JRC): Consider renaming the following two tests to make
