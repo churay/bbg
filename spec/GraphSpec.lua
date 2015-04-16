@@ -104,7 +104,14 @@ describe( "Graph", function()
   end )
 
   it( "properly removes vertices from the data structure", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    for testvertexidx = #testvertices, 1, -1 do 
+      local testvertex = testvertices[testvertexidx]
+
+      table.remove( testvertices, testvertexidx )
+      testgraph:removevertex( testvertex )
+
+      assert.are.equivalentlists( testvertices, testgraph:queryvertices() )
+    end
   end )
 
   it( "removes all edges attached to a vertex upon its removal", function()

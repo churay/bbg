@@ -46,8 +46,8 @@ end
 function Graph.removevertex( self, vertex )
   local vertex = self:findvertex( vertex )
   if vertex then
-    for vinedge in vertex:getinedges() do self:removeedge( vinedge ) end
-    for voutedge in vertex:getoutedges() do self:removeedge( voutedge ) end
+    for _, ie in ipairs( vertex:getinedges() ) do self:removeedge( ie ) end
+    for _, oe in ipairs( vertex:getoutedges() ) do self:removeedge( oe ) end
 
     local vid = vertex._vid
     self._vertices[vid] = nil
@@ -141,7 +141,7 @@ end
 function Graph.Vertex.getoutedges( self )
   local outedges = {}
 
-  for dstvid in self._graph.outgoing[self._vid] do
+  for dstvid in pairs( self._graph._edges.outgoing[self._vid] ) do
     local dstvertex = Graph.Vertex( self._graph, dstvid )
     table.insert( outedges, self._graph:findedge(self, dstvertex) )
   end
@@ -152,9 +152,9 @@ end
 function Graph.Vertex.getinedges( self )
   local inedges = {}
 
-  for dstvid in self._graph.incoming[self._vid] do
-    local dstvertex = Graph.Vertex( self._graph, dstvid )
-    table.insert( inedges, self._graph:findedge(dstvertex, self) )
+  for srcvid in pairs( self._graph._edges.incoming[self._vid] ) do
+    local srcvertex = Graph.Vertex( self._graph, srcvid )
+    table.insert( inedges, self._graph:findedge(srcvertex, self) )
   end
 
   return inedges
