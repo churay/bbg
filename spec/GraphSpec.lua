@@ -116,10 +116,32 @@ describe( "Graph", function()
 
   it( "removes all edges attached to a vertex upon its removal", function()
     pending( "TODO(JRC): Implement this test case!" )
+    local edgegraph = Graph()
+
+    local centralvertex = edgegraph:addvertex( "c" )
+    local outervertices = {}
+    for vidx = 1, 6, 1 do
+      local outervertex = edgegraph:addvertex( tostring(vidx) )
+      table.insert( outervertices, outervertex )
+
+      if vidx % 2 == 0 then edgegraph:addedge( centralvertex, outervertex )
+      else edgegraph:addedge( outervertex, centralvertex ) end
+    end
+
+    assert.are.equal( #outervertices, #testgraph:queryedges() )
+    edgegraph:removevertex( centralvertex )
+    assert.are.equal( 0, #testgraph:queryedges() )
   end )
 
   it( "properly removes edges from the data structure", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    for testedgeidx = #testedges, 1, -1 do 
+      local testedge = testedges[testedgeidx]
+
+      table.remove( testedges, testedgeidx )
+      testgraph:removeedge( testedge )
+
+      assert.are.equivalentlists( testedges, testgraph:queryedges() )
+    end
   end )
 
   it( "returns only existing vertices queried via 'findvertex'", function()
