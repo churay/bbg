@@ -18,6 +18,7 @@ end
 
 function Graph.addvertex( self, vlabel )
   local vid = self:_getnextvid()
+  local vlabel = vlabel == nil and true or vlabel
 
   self._vertices[vid] = vlabel
   self._edges.labels[vid] = {}
@@ -35,6 +36,7 @@ function Graph.addedge( self, srcvertex, dstvertex, elabel )
     end
 
     local srcvid = srcvertex._vid; local dstvid = dstvertex._vid
+    local elabel = elabel == nil and true or elabel
     self._edges.labels[srcvid][dstvid] = elabel
     self._edges.outgoing[srcvid][dstvid] = true
     self._edges.incoming[dstvid][srcvid] = true

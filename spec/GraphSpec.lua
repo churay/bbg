@@ -115,7 +115,6 @@ describe( "Graph", function()
   end )
 
   it( "removes all edges attached to a vertex upon its removal", function()
-    pending( "TODO(JRC): Implement this test case!" )
     local edgegraph = Graph()
 
     local centralvertex = edgegraph:addvertex( "c" )
@@ -128,9 +127,9 @@ describe( "Graph", function()
       else edgegraph:addedge( outervertex, centralvertex ) end
     end
 
-    assert.are.equal( #outervertices, #testgraph:queryedges() )
+    assert.are.equal( #outervertices, #edgegraph:queryedges() )
     edgegraph:removevertex( centralvertex )
-    assert.are.equal( 0, #testgraph:queryedges() )
+    assert.are.equal( 0, #edgegraph:queryedges() )
   end )
 
   it( "properly removes edges from the data structure", function()
@@ -180,11 +179,24 @@ describe( "Graph", function()
   -- make sense within the context of the graph being queried.
 
   it( "facilitates arbitrary vertex queries with 'queryvertices'", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    local queriedvertices = testgraph:queryvertices( function(v)
+      return tonumber( v:getlabel() ) >= 3
+    end )
+
+    assert.are.equal( 3, #queriedvertices )
+    assert.are.equivalentlists(
+      { testvertices[3], testvertices[4], testvertices[5] },
+      queriedvertices
+    )
   end )
 
   it( "facilitates arbitrary edge queries with 'queryedges'", function()
-    pending( "TODO(JRC): Implement this test case!" )
+    local queriededges = testgraph:queryedges( function(e)
+      return e:getdestination() == testvertices[5] or e:getsource() == testvertices[5]
+    end )
+
+    assert.are.equal( 2, #queriededges )
+    assert.are.equivalentlists( {testedges[3], testedges[4]}, queriededges )
   end )
 
 end )
