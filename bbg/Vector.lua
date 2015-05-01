@@ -64,6 +64,8 @@ function Vector.normalize( self )
   self._y = self._y / magnitude
 end
 
+-- TODO(JRC): Implement copy function.
+
 --[[ Accessor Functions ]]--
 
 function Vector.getx( self ) return self._x end
