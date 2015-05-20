@@ -1,10 +1,10 @@
 local Class = require( "Class" )
-local Queue = require( "Queue" )
 local Vector = require( "Vector" )
 local Bubble = require( "Bubble" )
 local Shooter = Class()
 
--- TODO(JRC): Implement this class!
+-- TODO(JRC): Improve the concept of the "Bubble Queue" so that it isn't so tightly
+-- integrated with this class (or, at the very least, is more elegantly integrated).
 
 function Shooter._init( self, pos, shotspeed, rotspeed )
   self._pos = pos
@@ -12,11 +12,6 @@ function Shooter._init( self, pos, shotspeed, rotspeed )
   self._shotspeed = shotspeed or 10.0
   self._rotspeed = rotspeed or 2.0
   self._shotangle = math.pi / 2.0
-
-  self._bubblequeue = Queue()
-  for bubbleidx = 1, 3, 1 do
-    self._bubblequeue:enqueue( self:_getnextbubble() )
-  end
 end
 
 function Shooter.adjust( self, rotdir )
@@ -26,8 +21,7 @@ function Shooter.adjust( self, rotdir )
 end
 
 function Shooter.shoot( self )
-  local nextbubble = self._bubblequeue:dequeue()
-  self._bubblequeue:enqueue( self:_getnextbubble() )
+  local nextbubble = self:_getnextbubble()
 
   nextbubble._pos = Vector( self._pos:getx(), self._pos:gety() )
   nextbubble._vel = self._shotspeed * self:_getdirvector()
@@ -55,3 +49,5 @@ end
 function Shooter._getdirvector( self )
   return Vector( math.cos(self._shotangle), math.sin(self._shotangle) )
 end
+
+return Shooter

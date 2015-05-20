@@ -22,6 +22,8 @@ function Bubble.update( self, dt )
 end
 
 function Bubble.draw( self, canvas )
-  canvas.setColor( unpack(color) )
+  canvas.setColor( unpack(self._color) )
   canvas.circle( "fill", self._pos:getx(), self._pos:gety(), 5, 5 )
 end
+
+return Bubble

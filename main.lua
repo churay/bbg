@@ -1,3 +1,7 @@
+-- TODO(JRC): Eliminate this path inclusion somehow.
+package.path = package.path .. ";bbg/?.lua"
+local bbg = require( "bbg" )
+
 function love.run()
   math.randomseed( os.time() )
 
@@ -9,10 +13,12 @@ function love.run()
   while isrunning do
     if love.event then
       love.event.pump()
-      for levent in love.event.poll() do
+      for levent, a, b, c, d in love.event.poll() do
         if levent == "quit" then
           isrunning = false
         end
+
+        love.handlers[levent]( a, b, c, d )
       end
     end
 
@@ -33,22 +39,34 @@ function love.run()
 end
 
 function love.load()
-  color = { intensity = 0, alpha = 255 }
-  intensityincreasing = true
+  bubbles = {}
+  shooter = bbg.Shooter(
+    bbg.Vector( love.window.getWidth() / 2.0, 5.0 ), 200.0, 0.025
+  )
+end
+
+-- TODO(JRC): Move the input handling step to its own proper function.
+function love.keypressed( keycode )
+  if keycode == " " then table.insert( bubbles, shooter:shoot() ) end
 end
 
 function love.update( timedelta )
-  local colordelta = (intensityincreasing and 1 or -1) * math.ceil( timedelta )
+  -- TODO(JRC): Move the input handling step to its own proper function.
+  if love.keyboard.isDown( "right" ) then shooter:adjust( -1.0 ) end
+  if love.keyboard.isDown( "left" ) then shooter:adjust( 1.0 ) end
 
-  color.intensity = color.intensity + colordelta
-
-  if color.intensity >= 255 or color.intensity <= 0 then
-    intensityincreasing = not intensityincreasing
+  shooter:update( timedelta )
+  -- TODO(JRC): Remove bubbles that are outside the bounds of the screen.
+  for _, bubble in ipairs( bubbles ) do
+    bubble:update( timedelta )
   end
 end
 
 function love.draw()
   love.graphics.clear()
 
-  love.graphics.setBackgroundColor( color.intensity, color.intensity, color.intensity, color.alpha )
+  shooter:draw( love.graphics )
+  for _, bubble in ipairs( bubbles ) do
+    bubble:draw( love.graphics )
+  end
 end
