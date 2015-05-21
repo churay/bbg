@@ -1,57 +1,65 @@
 local Class = require( "Class" )
 local Queue = Class()
 
--- TODO(JRC): Optimize this class so that dequeue operations occur in constant time.
-
 --[[ Constructors ]]--
 
 function Queue._init( self )
   self._entries = {}
+
+  self._startidx = 1
+  self._endidx = 0
 end
 
 --[[ Operator Overloads ]]--
 
-function Queue.__eq( self, queue )
-  return false
-end
+function Queue.__eq( self, other )
+  local selflist = self:tolist(); local otherlist = other:tolist()
 
-function Queue.__tostring( self )
-  local queuestring = ""
-
-  queuestring = queuestring .. "< "
-  for _, entry in ipairs( self:tolist() ) do
-    queuestring = queuestring .. tostring( entry ) .. ", "
+  if self:length() ~= other:length() then
+    return false
+  else
+    local listsequal = true
+    for entryidx = 1, self:length(), 1 do
+      listsequal = listsequal and selflist[entryidx] == otherlist[entryidx]
+    end
+    return listsequal
   end
-  queuestring = queuestring .. ">"
-
-  return queuestring
 end
 
 --[[ Public Functions ]]--
 
 function Queue.enqueue( self, entry )
-  table.insert( self._entries, entry )
+  self._endidx = self._endidx + 1
+  table.insert( self._entries, self._endidx, entry )
 end
 
 function Queue.dequeue( self )
-  return table.remove( self._entries, 1 )
+  self._startidx = self._startidx + 1
+  return table.remove( self._entries, self._startidx - 1 )
 end
 
 function Queue.peek( self )
-  return self._entries[1]
+  return self._entries[self._startidx]
+end
+
+function Queue.length( self )
+  return self._endidx - self._startidx + 1
 end
 
 function Queue.clear( self )
   for key, _ in pairs( self._entries ) do
     self._entries[key] = nil
   end
+
+  self._startidx = 1
+  self._endidx = 0
 end
 
 function Queue.tolist( self )
   local queuelist = {}
 
-  for _, entry in ipairs( self._entries ) do
-    table.insert( queuelist, entry )
+  for entryidx = self._startidx, self._endidx, 1 do
+    table.insert( queuelist, self._entries[entryidx] )
   end
 
   return queuelist

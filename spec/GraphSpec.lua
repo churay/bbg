@@ -174,10 +174,6 @@ describe( "Graph", function()
     assert.falsy( testgraph:findedge(remotevertices[1], remotevertices[2]) )
   end )
 
-  -- TODO(JRC): Consider renaming the following two tests to make
-  -- it more clear that the tests are verifiying that the results
-  -- make sense within the context of the graph being queried.
-
   it( "facilitates arbitrary vertex queries with 'queryvertices'", function()
     local queriedvertices = testgraph:queryvertices( function(v)
       return tonumber( v:getlabel() ) >= 3
