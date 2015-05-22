@@ -2,22 +2,30 @@ local assert = require( "luassert" )
 local say = require( "say" )
 
 local function nearlyequal( state, arguments )
-  local expectednumber = arguments[1]
-  local actualnumber = arguments[2]
+  local expectednumber = arguments[1]; local actualnumber = arguments[2]
   local epsilon = arguments[3] or 1e-7
 
   return math.abs( expectednumber - actualnumber ) < epsilon
 end
 
+-- TODO(JRC): Add a flag to this function to make it possible to perform deep
+-- comparisons on the lists being compared.
 local function equivalentlists( state, arguments )
-  local expectedlist = arguments[1]
-  local actuallist = arguments[2]
+  local expectedlist = arguments[1]; local actuallist = arguments[2]
+  local ignoreorder = arguments[3] or true
 
-  for _, expectedvalue in ipairs( expectedlist ) do
+  for expectedkey, expectedvalue in ipairs( expectedlist ) do
     local expectedexists = false
-    for _, actualvalue in ipairs( actuallist ) do
-      expectedexists = expectedexists or expectedvalue == actualvalue
+
+    if ignoreorder then
+      for _, actualvalue in ipairs( actuallist ) do
+        expectedexists = expectedexists or expectedvalue == actualvalue
+      end
+    else
+      local actualvalue = actuallist[expectedkey]
+      expectedexists = actualvalue ~= nil and expectedvalue == actualvalue
     end
+
     if not expectedexists then return false end
   end
 

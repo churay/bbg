@@ -30,12 +30,14 @@ end
 
 function Queue.enqueue( self, entry )
   self._endidx = self._endidx + 1
-  table.insert( self._entries, self._endidx, entry )
+  self._entries[self._endidx] = entry
 end
 
 function Queue.dequeue( self )
+  local dequeuedvalue = self._entries[self._startidx]
+  self._entries[self._startidx] = nil
   self._startidx = self._startidx + 1
-  return table.remove( self._entries, self._startidx - 1 )
+  return dequeuedvalue
 end
 
 function Queue.peek( self )
