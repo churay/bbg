@@ -56,14 +56,16 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +12 bbg/Graph.lua
-badd +19 bbg/Bubble.lua
-badd +58 bbg/Vector.lua
-badd +3 bbg/Shooter.lua
+badd +36 bbg/Bubble.lua
+badd +49 bbg/Vector.lua
+badd +2 bbg/Shooter.lua
 badd +20 bbg/Queue.lua
 badd +32 spec/GraphSpec.lua
-badd +0 main.lua
-badd +12 bbg/init.lua
+badd +65 main.lua
+badd +8 bbg/init.lua
 badd +6 makefile
+badd +8 bbg/BubbleBoard.lua
+badd +0 bbg/Box.lua
 args bbg/Graph.lua
 edit main.lua
 set splitbelow splitright
@@ -71,19 +73,12 @@ wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-wincmd _ | wincmd |
-split
-1wincmd k
-wincmd w
 set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
 exe 'vert 1resize ' . ((&columns * 136 + 137) / 274)
-exe '2resize ' . ((&lines * 32 + 35) / 70)
 exe 'vert 2resize ' . ((&columns * 137 + 137) / 274)
-exe '3resize ' . ((&lines * 33 + 35) / 70)
-exe 'vert 3resize ' . ((&columns * 137 + 137) / 274)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -187,12 +182,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 42 - ((41 * winheight(0) + 33) / 66)
+let s:l = 61 - ((31 * winheight(0) + 33) / 66)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-42
-normal! 060|
+61
+normal! 04|
 wincmd w
 argglobal
 edit bbg/Shooter.lua
@@ -298,15 +293,28 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 18 - ((17 * winheight(0) + 16) / 32)
+let s:l = 52 - ((51 * winheight(0) + 33) / 66)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-18
-normal! 02|
+52
+normal! 0
 wincmd w
+exe 'vert 1resize ' . ((&columns * 136 + 137) / 274)
+exe 'vert 2resize ' . ((&columns * 137 + 137) / 274)
+tabedit bbg/Box.lua
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 137 + 137) / 274)
+exe 'vert 2resize ' . ((&columns * 136 + 137) / 274)
 argglobal
-edit bbg/Bubble.lua
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -409,19 +417,126 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 4 - ((3 * winheight(0) + 16) / 33)
+let s:l = 4 - ((3 * winheight(0) + 33) / 66)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 4
 normal! 0
 wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 136 + 137) / 274)
-exe '2resize ' . ((&lines * 32 + 35) / 70)
-exe 'vert 2resize ' . ((&columns * 137 + 137) / 274)
-exe '3resize ' . ((&lines * 33 + 35) / 70)
-exe 'vert 3resize ' . ((&columns * 137 + 137) / 274)
+argglobal
+edit bbg/Vector.lua
+setlocal keymap=
+setlocal noarabic
+setlocal autoindent
+setlocal nobinary
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal nocindent
+setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal colorcolumn=
+setlocal comments=:--
+setlocal commentstring=--%s
+setlocal complete=.,w,b,u,t,i
+setlocal concealcursor=inc
+setlocal conceallevel=2
+setlocal completefunc=
+setlocal nocopyindent
+setlocal cryptmethod=
+setlocal nocursorbind
+setlocal nocursorcolumn
+setlocal nocursorline
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal expandtab
+if &filetype != 'lua'
+setlocal filetype=lua
+endif
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+setlocal foldlevel=0
+setlocal foldmarker={{{,}}}
+setlocal foldmethod=manual
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=croql
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=0
+setlocal include=
+setlocal includeexpr=
+setlocal indentexpr=GetLuaIndent()
+setlocal indentkeys=0{,0},:,0#,!^F,o,O,e,0=end,0=until
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255,$,-
+setlocal keywordprg=
+setlocal nolinebreak
+setlocal nolisp
+set list
+setlocal list
+setlocal makeprg=
+setlocal matchpairs=(:),{:},[:]
+setlocal modeline
+setlocal modifiable
+setlocal nrformats=octal,hex
+set number
+setlocal number
+setlocal numberwidth=4
+setlocal omnifunc=
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal norelativenumber
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal shiftwidth=2
+setlocal noshortname
+setlocal nosmartindent
+setlocal softtabstop=0
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal statusline=
+setlocal suffixesadd=.lua
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'lua'
+setlocal syntax=lua
+endif
+setlocal tabstop=2
+setlocal tags=
+setlocal textwidth=0
+setlocal thesaurus=
+setlocal noundofile
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+silent! normal! zE
+let s:l = 12 - ((11 * winheight(0) + 33) / 66)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+12
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 137 + 137) / 274)
+exe 'vert 2resize ' . ((&columns * 136 + 137) / 274)
 tabedit bbg/Bubble.lua
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -537,12 +652,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 29 - ((28 * winheight(0) + 33) / 66)
+let s:l = 35 - ((34 * winheight(0) + 33) / 66)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-29
-normal! 013|
+35
+normal! 0
 wincmd w
 argglobal
 edit bbg/Shooter.lua
@@ -648,14 +763,13 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 53 - ((52 * winheight(0) + 33) / 66)
+let s:l = 44 - ((43 * winheight(0) + 33) / 66)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-53
-normal! 014|
+44
+normal! 0
 wincmd w
-2wincmd w
 exe 'vert 1resize ' . ((&columns * 137 + 137) / 274)
 exe 'vert 2resize ' . ((&columns * 136 + 137) / 274)
 tabnext 1

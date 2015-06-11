@@ -27,6 +27,7 @@ function love.run()
       timedelta = love.timer.getDelta()
     end
 
+    if love.getinput then love.getinput() end
     if love.update then love.update( timedelta ) end
     if love.window and love.graphics and love.window.isCreated() then
       love.graphics.clear()
@@ -39,34 +40,55 @@ function love.run()
 end
 
 function love.load()
+  screenbox = bbg.Box( 0.0, 0.0, love.window.getMode() )
+
   bubbles = {}
   shooter = bbg.Shooter(
     bbg.Vector( love.window.getWidth() / 2.0, 5.0 ), 200.0, 0.025
   )
 end
 
--- TODO(JRC): Move the input handling step to its own proper function.
-function love.keypressed( keycode )
-  if keycode == " " then table.insert( bubbles, shooter:shoot() ) end
+function love.getinput()
+  if love.keyboard.isDown( "right" ) or love.keyboard.isDown( "l" ) then
+    shooter:adjust( -1.0 )
+  end
+  if love.keyboard.isDown( "left" ) or love.keyboard.isDown( "h" ) then
+    shooter:adjust( 1.0 )
+  end
+  if love.keyboard.isDown( " " ) then
+    table.insert( bubbles, shooter:shoot() )
+  end
+  if love.keyboard.isDown( "q" ) then
+    love.event.push( "quit" )
+  end
 end
 
 function love.update( timedelta )
-  -- TODO(JRC): Move the input handling step to its own proper function.
-  if love.keyboard.isDown( "right" ) then shooter:adjust( -1.0 ) end
-  if love.keyboard.isDown( "left" ) then shooter:adjust( 1.0 ) end
-
   shooter:update( timedelta )
-  -- TODO(JRC): Remove bubbles that are outside the bounds of the screen.
-  for _, bubble in ipairs( bubbles ) do
-    bubble:update( timedelta )
+
+  for bubbleidx = #bubbles, 1, -1 do
+    bubbles[bubbleidx]:update( timedelta )
+    if bubbleidx == 1 then 
+      print( tostring(bubbles[bubbleidx]:getbbox()) )
+      print( tostring(screenbox) )
+    end
+    if not screenbox:intersects( bubbles[bubbleidx]:getbbox() ) then
+      table.remove( bubbles, bubbleidx )
+    end
   end
 end
 
 function love.draw()
-  love.graphics.clear()
+  -- TODO(JRC): Attempt to change this so that the coordinate system is changed
+  -- only once at the beginning of the game and not each frame.
+  love.graphics.push()
+  love.graphics.translate( 0.0, love.window.getHeight() )
+  love.graphics.scale( 1.0, -1.0 )
 
   shooter:draw( love.graphics )
   for _, bubble in ipairs( bubbles ) do
     bubble:draw( love.graphics )
   end
+
+  love.graphics.pop()
 end

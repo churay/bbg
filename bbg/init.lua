@@ -5,6 +5,7 @@ bbg = {
   Class = require( "Class" ),
 
   Vector = require( "Vector" ),
+  Box = require( "Box" ),
   Queue = require( "Queue" ),
   Graph = require( "Graph" ),
 

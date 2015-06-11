@@ -1,6 +1,9 @@
 local Class = require( "Class" )
 local Vector = require( "Vector" )
+local Box = require( "Box" )
 local Bubble = Class()
+
+Bubble.RADIUS = 5
 
 -- TODO(JRC): Determine whether the logic for stopping bubbles should be included
 -- in this file or elsewhere.
@@ -23,7 +26,14 @@ end
 
 function Bubble.draw( self, canvas )
   canvas.setColor( unpack(self._color) )
-  canvas.circle( "fill", self._pos:getx(), self._pos:gety(), 5, 5 )
+  canvas.circle( "fill", self._pos:getx(), self._pos:gety(), Bubble.RADIUS, 20 )
+end
+
+function Bubble.getbbox( self )
+  local minx = self._pos:getx() - Bubble.RADIUS / 2.0
+  local miny = self._pos:gety() - Bubble.RADIUS / 2.0
+
+  return Box( minx, miny, Bubble.RADIUS, Bubble.RADIUS )
 end
 
 return Bubble
