@@ -68,10 +68,7 @@ function love.update( timedelta )
 
   for bubbleidx = #bubbles, 1, -1 do
     bubbles[bubbleidx]:update( timedelta )
-    if bubbleidx == 1 then 
-      print( tostring(bubbles[bubbleidx]:getbbox()) )
-      print( tostring(screenbox) )
-    end
+
     if not screenbox:intersects( bubbles[bubbleidx]:getbbox() ) then
       table.remove( bubbles, bubbleidx )
     end

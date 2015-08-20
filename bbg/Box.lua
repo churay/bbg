@@ -28,17 +28,17 @@ end
 -- TODO(JRC): Implement more useful axis-aligned rectangle functions here.
 
 function Box.intersects( self, box )
-  local mpos = self:getmin(); local opos = box:getmin()
+  local mpos = self:getmid(); local opos = box:getmid()
 
-  -- TODO(JRC): Fix this.
-  return 2.0 * math.abs( mpos:getx() - opos:getx() ) < self:getw() + box:getw() and
-    2.0 * math.abs( mpos:gety() - opos:gety() ) < self:geth() + box:geth()
+  return math.abs( mpos:getx() - opos:getx() ) < 0.5 * ( self:getw() + box:getw() ) and
+    math.abs( mpos:gety() - opos:gety() ) < 0.5 * ( self:geth() + box:geth() )
 end
 
 --[[ Accessor Functions ]]--
 
 function Box.getmin( self ) return self._min end
 function Box.getmax( self ) return self._min + Vector( self._width, self._height ) end
+function Box.getmid( self ) return self._min + 0.5 * Vector( self._width, self._height ) end
 function Box.getw( self ) return self._width end
 function Box.geth( self ) return self._height end
 
