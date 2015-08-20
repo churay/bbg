@@ -83,9 +83,7 @@ function love.draw()
   love.graphics.scale( 1.0, -1.0 )
 
   shooter:draw( love.graphics )
-  for _, bubble in ipairs( bubbles ) do
-    bubble:draw( love.graphics )
-  end
+  for _, bubble in ipairs( bubbles ) do bubble:draw( love.graphics ) end
 
   love.graphics.pop()
 end

@@ -49,7 +49,7 @@ function Vector.dot( self, vector )
 end
 
 function Vector.angleto( self, vector )
-  -- a.b = |a||b|cos(t) ==> t = acos( a.b / |a||b| )
+  -- a . b = |a||b|cos(t) ==> t = acos( a.b / |a||b| )
   return math.acos( self:dot(vector) / (self:magnitude()*vector:magnitude()) )
 end
 
@@ -63,8 +63,6 @@ function Vector.normalize( self )
   self._x = self._x / magnitude
   self._y = self._y / magnitude
 end
-
--- TODO(JRC): Implement copy function.
 
 --[[ Accessor Functions ]]--
 

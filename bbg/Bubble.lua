@@ -20,6 +20,14 @@ function Bubble._init( self, pos, vel, color )
   self._color = color
 end
 
+function Bubble.bounce( self )
+  self._vel = self._vel + Vector( -2.0 * self._vel:getx(), 0.0 )
+end
+
+function Bubble.stop( self )
+  self._vel = Vector( 0.0, 0.0 )
+end
+
 function Bubble.update( self, dt )
   self._pos = self._pos + dt * self._vel
 end
