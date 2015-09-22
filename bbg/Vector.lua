@@ -68,5 +68,6 @@ end
 
 function Vector.getx( self ) return self._x end
 function Vector.gety( self ) return self._y end
+function Vector.getxy( self ) return self._x, self._y end
 
 return Vector

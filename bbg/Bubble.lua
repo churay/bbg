@@ -3,21 +3,16 @@ local Vector = require( "Vector" )
 local Box = require( "Box" )
 local Bubble = Class()
 
-Bubble.RADIUS = 2.5e-1
-
--- TODO(JRC): Determine whether the logic for stopping bubbles should be included
--- in this file or elsewhere.
+Bubble.RADIUS = 1.0 / 40.0
 
 function Bubble._init( self, pos, vel, color )
   self._pos = pos
   self._vel = vel
-  -- TODO(JRC): Remember that the type of this thing should be a list containing
-  -- the red, green, and blue components of the bubble color.
   -- TODO(JRC): Determine whether the random color should be the default value
   -- or whether this value should always be set by the constructor (probably the
   -- latter to make it possible for the game to generate the same set of bubbles
   -- for two competing players).
-  self._color = color
+  self._color = color or {255, 255, 255}
 end
 
 function Bubble.bounce( self )
@@ -33,8 +28,11 @@ function Bubble.update( self, dt )
 end
 
 function Bubble.draw( self, canvas )
+  canvas.push()
+  canvas.translate( self._pos:getxy() )
   canvas.setColor( unpack(self._color) )
-  canvas.circle( "fill", self._pos:getx(), self._pos:gety(), Bubble.RADIUS, 40 )
+  canvas.circle( "fill", 0.0, 0.0, Bubble.RADIUS, 1.0 / Bubble.RADIUS )
+  canvas.pop()
 end
 
 function Bubble.getbbox( self )
