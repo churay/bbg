@@ -42,13 +42,16 @@ end
 function love.load()
   screenbox = bbg.Box( 0.0, 0.0, love.window.getMode() )
 
-  bubbles = {}
+  bubbles = { bbg.Bubble( bbg.Vector(0.75, 0.75), bbg.Vector(0.0, 0.0), {255, 255, 255} ) }
+  --[[
   shooter = bbg.Shooter(
     bbg.Vector( love.window.getWidth() / 2.0, 5.0 ), 200.0, 0.025
   )
+  ]]--
 end
 
 function love.getinput()
+  --[[
   if love.keyboard.isDown( "right" ) or love.keyboard.isDown( "l" ) then
     shooter:adjust( -1.0 )
   end
@@ -58,20 +61,23 @@ function love.getinput()
   if love.keyboard.isDown( " " ) then
     table.insert( bubbles, shooter:shoot() )
   end
+  ]]--
   if love.keyboard.isDown( "q" ) then
     love.event.push( "quit" )
   end
 end
 
 function love.update( timedelta )
-  shooter:update( timedelta )
+  -- shooter:update( timedelta )
 
   for bubbleidx = #bubbles, 1, -1 do
     bubbles[bubbleidx]:update( timedelta )
 
+    --[[
     if not screenbox:intersects( bubbles[bubbleidx]:getbbox() ) then
       table.remove( bubbles, bubbleidx )
     end
+    ]]--
   end
 end
 
@@ -79,10 +85,13 @@ function love.draw()
   -- TODO(JRC): Attempt to change this so that the coordinate system is changed
   -- only once at the beginning of the game and not each frame.
   love.graphics.push()
-  love.graphics.translate( 0.0, love.window.getHeight() )
+  love.graphics.scale( love.window.getWidth(), love.window.getHeight() )
+  love.graphics.translate( 0.0, 1.0 )
   love.graphics.scale( 1.0, -1.0 )
+  -- love.graphics.translate( 0.0, love.window.getHeight() )
+  -- love.graphics.scale( 1.0, -1.0 )
 
-  shooter:draw( love.graphics )
+  -- shooter:draw( love.graphics )
   for _, bubble in ipairs( bubbles ) do bubble:draw( love.graphics ) end
 
   love.graphics.pop()
