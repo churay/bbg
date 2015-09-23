@@ -40,10 +40,8 @@ function love.run()
 end
 
 function love.load()
-  screenbox = bbg.Box( 0.0, 0.0, 1.0, 1.0 )
-
-  bubbles = {}
-  shooter = bbg.Shooter( bbg.Vector(1.0/2.0, 0.0), 1.0 )
+  board = bbg.BubbleBoard( bbg.Box(0.10, 0.0, 0.80, 1.0), 20, 20 )
+  shooter = bbg.Shooter( bbg.Vector(0.5, 0.0), 1.0, math.pi / 2.0  )
 end
 
 function love.keypressed( key, isrepeat )
@@ -51,7 +49,7 @@ function love.keypressed( key, isrepeat )
 
   if key == "right" or key == "l" then shooter:rotate( -1.0 ) end
   if key == "left" or key == "h" then shooter:rotate( 1.0 ) end
-  if key == " " then table.insert( bubbles, shooter:shoot() ) end
+  if key == " " then board:add( shooter:shoot() ) end
 end
 
 function love.keyreleased( key )
@@ -59,15 +57,8 @@ function love.keyreleased( key )
 end
 
 function love.update( timedelta )
+  board:update( timedelta )
   shooter:update( timedelta )
-
-  for bubbleidx = #bubbles, 1, -1 do
-    bubbles[bubbleidx]:update( timedelta )
-
-    if not screenbox:intersects( bubbles[bubbleidx]:getbbox() ) then
-      table.remove( bubbles, bubbleidx )
-    end
-  end
 end
 
 function love.draw()
@@ -78,8 +69,8 @@ function love.draw()
   love.graphics.translate( 0.0, 1.0 )
   love.graphics.scale( 1.0, -1.0 )
 
+  board:draw( love.graphics )
   shooter:draw( love.graphics )
-  for _, bubble in ipairs( bubbles ) do bubble:draw( love.graphics ) end
 
   love.graphics.pop()
 end

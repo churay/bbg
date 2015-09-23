@@ -36,15 +36,16 @@ end
 
 function Shooter.draw( self, canvas )
   canvas.push()
-  canvas.setColor( 212, 154, 44 )
-  canvas.setLineWidth( 5.0e-3 )
   canvas.translate( self._pos:getxy() )
+
+  canvas.setLineWidth( 5.0e-3 )
+  canvas.setColor( 212, 154, 44 )
   canvas.line( 0.0, 0.0, ((1.0 / 20.0)*self:_getdirvector()):getxy() )
   canvas.pop()
 end
 
 function Shooter._getnextbubble( self )
-  return Bubble( Vector(-1,0, -1.0), Vector(0, 0), {255, 255, 255} )
+  return Bubble( Vector(-1,0, -1.0), Vector(0, 0), {237, 67, 55} )
 end
 
 function Shooter._getdirvector( self )

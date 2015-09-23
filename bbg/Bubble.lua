@@ -30,6 +30,7 @@ end
 function Bubble.draw( self, canvas )
   canvas.push()
   canvas.translate( self._pos:getxy() )
+
   canvas.setColor( unpack(self._color) )
   canvas.circle( "fill", 0.0, 0.0, Bubble.RADIUS, 1.0 / Bubble.RADIUS )
   canvas.pop()

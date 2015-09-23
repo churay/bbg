@@ -37,9 +37,10 @@ end
 --[[ Accessor Functions ]]--
 
 function Box.getmin( self ) return self._min end
-function Box.getmax( self ) return self._min + Vector( self._width, self._height ) end
-function Box.getmid( self ) return self._min + 0.5 * Vector( self._width, self._height ) end
+function Box.getmax( self ) return self._min + Vector( self:getdims() ) end
+function Box.getmid( self ) return self._min + 0.5 * Vector( self:getdims() ) end
 function Box.getw( self ) return self._width end
 function Box.geth( self ) return self._height end
+function Box.getdims( self ) return self._width, self._height end
 
 return Box
