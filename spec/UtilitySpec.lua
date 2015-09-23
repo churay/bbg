@@ -3,6 +3,22 @@ local Utility = require( "bbg.Utility" )
 describe( "Utility", function()
   --[[ Testing Functions ]]--
 
+  it( "clamps values outside of the given range to the closest value", function()
+    local minimum = 0.0
+    local maximum = 1.0
+
+    assert.are.equal( minimum, Utility.clamp(minimum - 1.0, minimum, maximum) )
+    assert.are.equal( maximum, Utility.clamp(maximum + 1.0, minimum, maximum) )
+  end )
+
+  it( "doesn't change a clamped value that lies in the given range", function()
+    local minimum = 0.0
+    local maximum = 1.0
+    local rangevalue = ( minimum + maximum ) / 2.0
+
+    assert.are.equal( rangevalue, Utility.clamp(rangevalue, minimum, maximum) )
+  end )
+
   it( "supports variable arguments packing", function()
     local nonilsvargs = Utility.packvargs( 1, 2, 3 )
 

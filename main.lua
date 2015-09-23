@@ -46,19 +46,16 @@ function love.load()
   shooter = bbg.Shooter( bbg.Vector(1.0/2.0, 0.0), 1.0 )
 end
 
-function love.getinput()
-  if love.keyboard.isDown( "right" ) or love.keyboard.isDown( "l" ) then
-    shooter:adjust( -1.0 )
-  end
-  if love.keyboard.isDown( "left" ) or love.keyboard.isDown( "h" ) then
-    shooter:adjust( 1.0 )
-  end
-  if love.keyboard.isDown( " " ) then
-    table.insert( bubbles, shooter:shoot() )
-  end
-  if love.keyboard.isDown( "q" ) then
-    love.event.push( "quit" )
-  end
+function love.keypressed( key, isrepeat )
+  if key == "q" then love.event.quit() end
+
+  if key == "right" or key == "l" then shooter:rotate( -1.0 ) end
+  if key == "left" or key == "h" then shooter:rotate( 1.0 ) end
+  if key == " " then table.insert( bubbles, shooter:shoot() ) end
+end
+
+function love.keyreleased( key )
+  if key == "right" or key == "l" or key == "left" or key == "h" then shooter:rotate( 0.0 ) end
 end
 
 function love.update( timedelta )
