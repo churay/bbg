@@ -11,5 +11,6 @@
 *.log
 
 ## OS Files ##
-.swp
-.swo
+*.swp
+*.swo
+*.*.sw*
