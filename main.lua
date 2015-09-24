@@ -40,25 +40,26 @@ function love.run()
 end
 
 function love.load()
-  board = bbg.BubbleBoard( bbg.Box(0.10, 0.0, 0.80, 1.0), 20, 20 )
-  shooter = bbg.Shooter( bbg.Vector(0.5, 0.0), 1.0, math.pi / 2.0  )
+  board = bbg.BubbleBoard()
 end
 
 function love.keypressed( key, isrepeat )
   if key == "q" then love.event.quit() end
 
-  if key == "right" or key == "l" then shooter:rotate( -1.0 ) end
-  if key == "left" or key == "h" then shooter:rotate( 1.0 ) end
-  if key == " " then board:add( shooter:shoot() ) end
+  -- TODO(JRC): Fix the exploit that allows players to rotate at double speed
+  -- if they press both of the same direction key at the same time.
+  if key == " " then board:shootbubble() end
+  if key == "left" or key == "h" then board:rotateshooter( 1.0 ) end
+  if key == "right" or key == "l" then board:rotateshooter( -1.0 ) end
 end
 
 function love.keyreleased( key )
-  if key == "right" or key == "l" or key == "left" or key == "h" then shooter:rotate( 0.0 ) end
+  if key == "left" or key == "h" then board:rotateshooter( -1.0 ) end
+  if key == "right" or key == "l" then board:rotateshooter( 1.0 ) end
 end
 
 function love.update( timedelta )
   board:update( timedelta )
-  shooter:update( timedelta )
 end
 
 function love.draw()
@@ -69,8 +70,9 @@ function love.draw()
   love.graphics.translate( 0.0, 1.0 )
   love.graphics.scale( 1.0, -1.0 )
 
+  love.graphics.translate( 0.1, 0.0 )
+  love.graphics.scale( 0.8, 1.0 )
   board:draw( love.graphics )
-  shooter:draw( love.graphics )
 
   love.graphics.pop()
 end

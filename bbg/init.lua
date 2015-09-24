@@ -11,6 +11,7 @@ bbg = {
 
   Bubble = require( "Bubble" ),
   Shooter = require( "Shooter" ),
+  BubbleGrid = require( "BubbleGrid" ),
   BubbleBoard = require( "BubbleBoard" ),
 }
 
