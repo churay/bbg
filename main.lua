@@ -40,7 +40,7 @@ function love.run()
 end
 
 function love.load()
-  board = bbg.BubbleBoard()
+  board = bbg.BubbleBoard( os.time(), 8, 11 )
 end
 
 function love.keypressed( key, isrepeat )
@@ -63,15 +63,16 @@ function love.update( timedelta )
 end
 
 function love.draw()
-  -- TODO(JRC): Attempt to change this so that the coordinate system is changed
-  -- only once at the beginning of the game and not each frame.
+  -- TODO(JRC): Try to implement (or at least derive) this solution more elegantly.
+  local boardratio = (board:getw() * love.window.getHeight()) / (board:geth() * love.window.getWidth())
+
   love.graphics.push()
   love.graphics.scale( love.window.getWidth(), love.window.getHeight() )
   love.graphics.translate( 0.0, 1.0 )
   love.graphics.scale( 1.0, -1.0 )
 
-  love.graphics.translate( 0.1, 0.0 )
-  love.graphics.scale( 0.8, 1.0 )
+  love.graphics.translate( (1.0 - boardratio) / 2.0, 0.0 )
+  love.graphics.scale( boardratio, 1.0 )
   board:draw( love.graphics )
 
   love.graphics.pop()

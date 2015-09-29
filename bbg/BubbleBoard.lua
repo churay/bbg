@@ -17,7 +17,7 @@ function BubbleBoard._init( self, boardseed, gridwidth, gridheight )
   local gridheight = gridheight or 11
 
   self._bubblegrid = BubbleGrid( gridwidth, gridheight )
-  self._shooter = Shooter( Vector(gridwidth / 2.0, 1.0), 1.8,  gridheight, math.pi / 2.0 )
+  self._shooter = Shooter( Vector(gridwidth / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
   self._bubbleseed = boardseed
 
   -- TODO(JRC): Upgrade this to a Bubble queue.
@@ -73,5 +73,10 @@ end
 function BubbleBoard.rotateshooter( self, rotdir )
   self._shooter:rotate( rotdir )
 end
+
+--[[ Accessor Functions ]]--
+
+function BubbleBoard.getw( self ) return self._bubblegrid:getw() end
+function BubbleBoard.geth( self ) return self._bubblegrid:geth() + 2 end
 
 return BubbleBoard
