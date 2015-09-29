@@ -63,16 +63,18 @@ function love.update( timedelta )
 end
 
 function love.draw()
-  -- TODO(JRC): Try to implement (or at least derive) this solution more elegantly.
-  local boardratio = (board:getw() * love.window.getHeight()) / (board:geth() * love.window.getWidth())
+  -- NOTE(JRC): The board scale is adjustd by the inverted window scale to
+  -- compensate for the difference this causes in window coordinates.
+  local window = { width=love.window.getWidth(), height=love.window.getHeight() }
+  local boardscale = (window.height / window.width) * (board:getw() / board:geth())
 
   love.graphics.push()
-  love.graphics.scale( love.window.getWidth(), love.window.getHeight() )
+  love.graphics.scale( window.width, window.height )
   love.graphics.translate( 0.0, 1.0 )
   love.graphics.scale( 1.0, -1.0 )
 
-  love.graphics.translate( (1.0 - boardratio) / 2.0, 0.0 )
-  love.graphics.scale( boardratio, 1.0 )
+  love.graphics.translate( (1.0 - boardscale) / 2.0, 0.0 )
+  love.graphics.scale( boardscale, 1.0 )
   board:draw( love.graphics )
 
   love.graphics.pop()
