@@ -25,16 +25,11 @@ end
 function BubbleGrid.update( self, dt )
   for bubbleidx = #self._bubblelist, 1, -1 do
     local bubble = self._bubblelist[bubbleidx]
+
+    if self:_getwallintx( bubble ) then bubble:bounce() end
+    if self:_getgridintx( bubble ) then table.remove( self._bubblelist, bubbleidx ) end
+
     bubble:update( dt )
-
-    if bubble:getbbox():getmin():getx() <= self._gridbox:getmin():getx() or
-        bubble:getbbox():getmax():getx() >= self._gridbox:getmax():getx() then
-      bubble:bounce()
-    end
-
-    if bubble:getbbox():getmax():gety() >= self._gridbox:getmax():gety() then
-      table.remove( self._bubblelist, bubbleidx )
-    end
   end
 end
 
@@ -56,5 +51,20 @@ end
 
 function BubbleGrid.getw( self ) return self._gridbox:getw() end
 function BubbleGrid.geth( self ) return self._gridbox:geth() end
+
+--[[ Private Functions ]]--
+
+function BubbleGrid._getwallintx( self, bubble )
+  local bubblebox = bubble:getbbox()
+
+  local isleftintx = bubblebox:getmin():getx() <= self._gridbox:getmin():getx()
+  local isrightintx = bubblebox:getmax():getx() >= self._gridbox:getmax():getx()
+
+  return isleftintx or isrightintx
+end
+
+function BubbleGrid._getgridintx( self, bubble )
+  return false
+end
 
 return BubbleGrid
