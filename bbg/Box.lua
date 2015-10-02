@@ -25,8 +25,6 @@ end
 
 --[[ Public Functions ]]--
 
--- TODO(JRC): Implement more useful axis-aligned rectangle functions here.
-
 function Box.intersects( self, box )
   local mpos = self:getmid(); local opos = box:getmid()
 

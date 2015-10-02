@@ -1,5 +1,10 @@
 local Utility = {}
 
+function Utility.inrange( v, min, max, exclusive )
+  if exclusive then return min < v and v < max
+  else return min <= v and v <= max end
+end
+
 function Utility.clamp( v, min, max )
   return math.max( math.min(v, max), min )
 end
