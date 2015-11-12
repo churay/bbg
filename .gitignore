@@ -1,3 +1,6 @@
+## Debugging Files ##
+debug/*
+
 ## Compiled Source Files ##
 *.o
 *.so
