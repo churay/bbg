@@ -27,6 +27,10 @@ function Bubble.draw( self, canvas )
 
   canvas.setColor( unpack(self._color) )
   canvas.circle( "fill", 0.0, 0.0, 0.5, 20.0 )
+
+  -- TODO(JRC): Remove this functionality after debugging is complete.
+  canvas.setColor( 234, 255, 0 )
+  canvas.rectangle( "line", -0.5, -0.5, 1.0, 1.0 )
   canvas.pop()
 end
 

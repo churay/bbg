@@ -48,8 +48,10 @@ function Vector.dot( self, vector )
   return self._x * vector._x + self._y * vector._y
 end
 
+-- TODO(JRC): Determine whether or not it is possible to return a signed
+-- value here to indicate whether the rotation angle is CW or CCW.
 function Vector.angleto( self, vector )
-  -- a . b = |a||b|cos(t) ==> t = acos( a.b / |a||b| )
+  -- a.b = |a||b|cos(t) ==> t = acos( a.b / |a||b| )
   return math.acos( self:dot(vector) / (self:magnitude()*vector:magnitude()) )
 end
 

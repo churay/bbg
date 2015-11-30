@@ -58,9 +58,14 @@ function BubbleGrid.draw( self, canvas )
 
   for _, bubble in ipairs( self._bubblelist ) do bubble:draw( love.graphics ) end
 
-  for _, bubblerow in ipairs( self._bubblegrid ) do
-    for _, bubble in ipairs( bubblerow ) do
+  for gridrow, bubblerow in ipairs( self._bubblegrid ) do
+    for gridcol, bubble in ipairs( bubblerow ) do
       if bubble ~= 0 then bubble:draw( love.graphics ) end
+
+      -- TODO(JRC): Remove the following debugging functionality.
+      local cellpos = self:_getcellpos( gridrow, gridcol )
+      canvas.setColor( 255, 30, 0 )
+      canvas.rectangle( "line", cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
     end
   end
 
@@ -72,9 +77,7 @@ function BubbleGrid.addbubble( self, bubble )
 end
 
 function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
-  local cellminx = gridcol - 1 + 0.5 * ( (gridrow + 1) % 2 )
-  local cellminy = self:geth() - gridrow
-  bubble._pos = Vector( cellminx, cellminy ) + Vector( 0.5, 0.5 )
+  bubble._pos = self:_getcellpos( gridrow, gridcol ) + Vector( 0.5, 0.5 )
 
   self._bubblegrid[gridrow][gridcol] = bubble
 end
@@ -116,9 +119,7 @@ function BubbleGrid._getgridintx( self, bubble )
   }
 
   for _, bubblecorner in ipairs( bubblecorners ) do
-    local intxrow = self:geth() - math.ceil( bubblecorner:gety() )
-    local intxcol = math.ceil( bubblecorner:getx() ) + ( intxrow % 2 )
-
+    local intxrow, intxcol = self:_getposcell( bubblecorner )
     local intxbubble = self._bubblegrid[intxrow] and self._bubblegrid[intxrow][intxcol]
     if intxbubble ~= nil and intxbubble ~= 0 then
       local intxbubblebbox = intxbubble:getbbox()
@@ -129,6 +130,7 @@ function BubbleGrid._getgridintx( self, bubble )
   end
 end
 
+-- TODO(JRC): Think of a better name for this function.
 function BubbleGrid._getgridpos( self, row, col, dir )
   local dirangle = dir:angleto( Vector(1.0, 0.0) )
 
@@ -136,9 +138,25 @@ function BubbleGrid._getgridpos( self, row, col, dir )
   local dirysign = dir:gety() > 0 and -1 or 1
 
   local dirxdelta = Utility.inrange( dirangle, 0.0, math.pi/2.0 ) and dirxright or dirxright-1
-  local dirydelta = Utility.inrange( dirangle, math.pi/6.0, 5.0*math.pi/6.0 ) and 1 or 0
+  local dirydelta = ( Utility.inrange( dirangle, math.pi/6.0, 5.0*math.pi/6.0 ) or row == 0 ) and 1 or 0
 
   return row + dirysign * dirydelta, col + dirxdelta
+end
+
+-- TODO(JRC): Figure out what is wrong with this function.
+function BubbleGrid._getposcell( self, pos )
+  local cellrow = self:geth() - math.floor( pos:gety() )
+  local cellcol = math.ceil( pos:getx() ) + ( cellrow % 2 )
+
+  return cellrow, cellcol
+end
+
+-- TODO(JRC): Figure out what is wrong with this function.
+function BubbleGrid._getcellpos( self, cellrow, cellcol )
+  local cellminx = cellcol - 1 + 0.5 * ( (cellrow + 1) % 2 )
+  local cellminy = self:geth() - cellrow
+
+  return Vector( cellminx, cellminy )
 end
 
 return BubbleGrid

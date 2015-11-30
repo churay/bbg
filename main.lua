@@ -2,6 +2,9 @@
 package.path = package.path .. ";bbg/?.lua"
 local bbg = require( "bbg" )
 
+-- package.path = package.path .. ";debug/?.lua"
+-- ldb = require( "debug.debugger" )
+
 function love.run()
   math.randomseed( os.time() )
 

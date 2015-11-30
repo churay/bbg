@@ -74,6 +74,7 @@ describe( "Vector", function()
     assert.are.nearlyequal( 0, testvector:angleto(testvector) )
     assert.are.nearlyequal( math.pi/2, Vector(1, 0):angleto(Vector(0, 1)) )
     assert.are.nearlyequal( math.pi, Vector(1, 0):angleto(Vector(-1, 0)) )
+    assert.are.nearlyequal( math.pi/2, Vector(1, 0):angleto(Vector(0, -1)) )
   end )
 
   it( "normalize properly turns vector to a unit equivalent", function()
