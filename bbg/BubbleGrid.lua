@@ -122,31 +122,15 @@ function BubbleGrid._getgridintx( self, bubble )
     local intxrow, intxcol = self:_getposcell( bubblecorner )
     local intxbubble = self._bubblegrid[intxrow] and self._bubblegrid[intxrow][intxcol]
     if intxbubble ~= nil and intxbubble ~= 0 then
-      local intxbubblebbox = intxbubble:getbbox()
-      local intxvector = bubblebbox:getmid() - intxbubblebbox:getmid()
-
-      return self:_getgridpos( intxrow, intxcol, intxvector )
+      return self:_getposcell( bubblebbox:getmid() )
     end
   end
-end
-
--- TODO(JRC): Think of a better name for this function.
-function BubbleGrid._getgridpos( self, row, col, dir )
-  local dirangle = dir:angleto( Vector(1.0, 0.0) )
-
-  local dirxright = ( col % 2 )
-  local dirysign = dir:gety() > 0 and -1 or 1
-
-  local dirxdelta = Utility.inrange( dirangle, 0.0, math.pi/2.0 ) and dirxright or dirxright-1
-  local dirydelta = ( Utility.inrange( dirangle, math.pi/6.0, 5.0*math.pi/6.0 ) or row == 0 ) and 1 or 0
-
-  return row + dirysign * dirydelta, col + dirxdelta
 end
 
 -- TODO(JRC): Figure out what is wrong with this function.
 function BubbleGrid._getposcell( self, pos )
   local cellrow = self:geth() - math.floor( pos:gety() )
-  local cellcol = math.ceil( pos:getx() ) + ( cellrow % 2 )
+  local cellcol = math.floor( pos:getx() ) + ( cellrow % 2 )
 
   return cellrow, cellcol
 end
