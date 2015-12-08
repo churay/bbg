@@ -122,15 +122,18 @@ function BubbleGrid._getgridintx( self, bubble )
     local intxrow, intxcol = self:_getposcell( bubblecorner )
     local intxbubble = self._bubblegrid[intxrow] and self._bubblegrid[intxrow][intxcol]
     if intxbubble ~= nil and intxbubble ~= 0 then
-      return self:_getposcell( bubblebbox:getmid() )
+      local intxbbox = intxbubble:getbbox()
+      if ( bubblebbox:getmid() - intxbbox:getmid() ):magnitude() < 2.0 then
+        return self:_getposcell( bubblebbox:getmid() )
+      end
     end
   end
 end
 
 -- TODO(JRC): Figure out what is wrong with this function.
 function BubbleGrid._getposcell( self, pos )
-  local cellrow = self:geth() - math.floor( pos:gety() )
-  local cellcol = math.floor( pos:getx() ) + ( cellrow % 2 )
+  local cellrow = self:geth() - math.ceil( pos:gety() ) + 1
+  local cellcol = math.ceil( pos:getx() - 0.5 * ((cellrow + 1) % 2) )
 
   return cellrow, cellcol
 end
