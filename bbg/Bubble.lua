@@ -12,7 +12,7 @@ function Bubble._init( self, pos, vel, colval )
 
   self._pos = pos
   self._vel = vel
-  self._color = Bubble.COLORS[(colval % #Bubble.COLORS) + 1.0]
+  self._color = Bubble.COLORS[1] --(colval % #Bubble.COLORS) + 1.0]
 end
 
 --[[ Public Functions ]]--
@@ -48,5 +48,11 @@ function Bubble.getbbox( self )
 
   return Box( minx, miny, 1.0, 1.0 )
 end
+
+--[[ Accessor Functions ]]--
+
+function Bubble.getcenter( self ) return self._pos end
+function Bubble.getvelocity( self ) return self._vel end
+function Bubble.getcolor( self ) return self._color end
 
 return Bubble

@@ -43,7 +43,37 @@ function BubbleGrid.update( self, dt )
       self:addgridbubble( bubble, gridrowintx, gridcolintx )
       table.remove( self._bubblelist, bubbleidx )
 
-      -- TODO(JRC): Implement the behavior for destroying bubbles.
+      -- Remove Bubble Chains Attached to the New Bubble --
+
+      -- TODO(JRC): Fix the bug in this code that causes the incorrect set of
+      -- bubbles to be popped.
+      local bubblestopop = {}
+      local bubblestotraverse = { self:_getcellid(gridrowintx, gridcolintx) }
+      while next( bubblestotraverse ) ~= nil do
+        local nextbubbleid = table.remove( bubblestotraverse )
+        local nextbubblerow, nextbubblecol = self:_getidcell( nextbubbleid )
+
+        bubblestopop[nextbubbleid] = { nextbubblerow, nextbubblecol }
+        local adjcells = self:_getadjcells( nextbubblerow, nextbubblecol )
+        for _, adjcell in ipairs( adjcells ) do
+          local adjcellrow, adjcellcol = adjcell[1], adjcell[2]
+          local adjcellid = self:_getcellid( adjcellrow, adjcellcol )
+          local adjbubble = self._bubblegrid[adjcellrow][adjcellcol]
+
+          if adjbubble ~= 0 and bubble:getcolor() == adjbubble:getcolor() and bubblestopop[adjcellid] == nil then
+            table.insert( bubblestotraverse, self:_getcellid(adjcellrow, adjcellcol) )
+          end
+        end
+      end
+
+      if Utility.len( bubblestopop ) >= 3 then
+        for _, bubbleloc in pairs( bubblestopop ) do
+          local bubblerow, bubblecol = bubbleloc[1], bubbleloc[2]
+          self._bubblegrid[bubblerow][bubblecol] = 0
+        end
+
+        -- TODO(JRC): Remove all bubbles that aren't attached to the top.
+      end
     end
 
     bubble:update( dt )
@@ -121,16 +151,34 @@ function BubbleGrid._getgridintx( self, bubble )
   for _, bubblecorner in ipairs( bubblecorners ) do
     local intxrow, intxcol = self:_getposcell( bubblecorner )
     local intxbubble = self._bubblegrid[intxrow] and self._bubblegrid[intxrow][intxcol]
+
     if intxbubble ~= nil and intxbubble ~= 0 then
-      local intxbbox = intxbubble:getbbox()
-      if ( bubblebbox:getmid() - intxbbox:getmid() ):magnitude() < 2.0 then
-        return self:_getposcell( bubblebbox:getmid() )
+      if( bubble:getcenter() - intxbubble:getcenter() ):magnitude() < 2.0 then
+        return self:_getposcell( bubble:getcenter() )
       end
     end
   end
 end
 
--- TODO(JRC): Figure out what is wrong with this function.
+function BubbleGrid._getadjcells( self, cellrow, cellcol )
+  local adjcells = {}
+  local cellrightdelta = ( cellrow + 1 ) % 2
+
+  for cellcoldelta = -1, 1 do
+    local cellrowdeltas = cellcoldelta == 0 and { -1, 1 } or
+      { cellrightdelta - 1, cellrightdelta }
+    for _, cellrowdelta in ipairs( cellrowdeltas ) do
+      local adjrow, adjcol = cellrow + cellrowdelta, cellcol + cellcoldelta
+      if Utility.inrange( adjrow, 1, self:geth() ) and
+          Utility.inrange( adjcol, 1, self:getw() ) then
+        table.insert( adjcells, {adjrow, adjcol} )
+      end
+    end
+  end
+
+  return adjcells
+end
+
 function BubbleGrid._getposcell( self, pos )
   local cellrow = self:geth() - math.ceil( pos:gety() ) + 1
   local cellcol = math.ceil( pos:getx() - 0.5 * ((cellrow + 1) % 2) )
@@ -138,12 +186,19 @@ function BubbleGrid._getposcell( self, pos )
   return cellrow, cellcol
 end
 
--- TODO(JRC): Figure out what is wrong with this function.
 function BubbleGrid._getcellpos( self, cellrow, cellcol )
   local cellminx = cellcol - 1 + 0.5 * ( (cellrow + 1) % 2 )
   local cellminy = self:geth() - cellrow
 
   return Vector( cellminx, cellminy )
+end
+
+function BubbleGrid._getcellid( self, cellrow, cellcol )
+  return ( cellcol - 1 ) + ( cellrow - 1 ) * self:getw()
+end
+
+function BubbleGrid._getidcell( self, cellid )
+  return math.floor( cellid / self:getw() ) + 1, ( cellid % self:getw() ) + 1
 end
 
 return BubbleGrid
