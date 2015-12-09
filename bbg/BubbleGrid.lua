@@ -165,10 +165,10 @@ function BubbleGrid._getadjcells( self, cellrow, cellcol )
   local adjcells = {}
   local cellrightdelta = ( cellrow + 1 ) % 2
 
-  for cellcoldelta = -1, 1 do
-    local cellrowdeltas = cellcoldelta == 0 and { -1, 1 } or
+  for cellrowdelta = -1, 1 do
+    local cellcoldeltas = cellrowdelta == 0 and { -1, 1 } or
       { cellrightdelta - 1, cellrightdelta }
-    for _, cellrowdelta in ipairs( cellrowdeltas ) do
+    for _, cellcoldelta in ipairs( cellcoldeltas ) do
       local adjrow, adjcol = cellrow + cellrowdelta, cellcol + cellcoldelta
       if Utility.inrange( adjrow, 1, self:geth() ) and
           Utility.inrange( adjcol, 1, self:getw() ) then
