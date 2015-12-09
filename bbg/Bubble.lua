@@ -12,7 +12,7 @@ function Bubble._init( self, pos, vel, colval )
 
   self._pos = pos
   self._vel = vel
-  self._color = Bubble.COLORS[1] --(colval % #Bubble.COLORS) + 1.0]
+  self._color = Bubble.COLORS[(colval % #Bubble.COLORS) + 1.0]
 end
 
 --[[ Public Functions ]]--

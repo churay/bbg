@@ -60,7 +60,8 @@ function BubbleGrid.update( self, dt )
           local adjcellid = self:_getcellid( adjcellrow, adjcellcol )
           local adjbubble = self._bubblegrid[adjcellrow][adjcellcol]
 
-          if adjbubble ~= 0 and bubble:getcolor() == adjbubble:getcolor() and bubblestopop[adjcellid] == nil then
+          if adjbubble ~= 0 and bubblestopop[adjcellid] == nil and
+              bubble:getcolor() == adjbubble:getcolor() then
             table.insert( bubblestotraverse, self:_getcellid(adjcellrow, adjcellcol) )
           end
         end
