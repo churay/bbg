@@ -17,12 +17,8 @@ function BubbleGrid._init( self, width, height )
   self._bubblegrid = {}
   self:clear()
 
-  local sentrow = 0
-  self._bubblegrid[sentrow] = {}
-  for sentcol = 1, self:getw() do
-    local sentbbox = Box( sentcol + 0.5, self:geth(), 1, 1 )
-    self._bubblegrid[sentrow][sentcol] = Bubble( sentbbox:getmid() )
-  end
+  self._bubblegrid[0] = {}
+  for sentcol = 1, self:getw() do self:addgridbubble( Bubble(), 0, sentcol ) end
 end
 
 --[[ Public Functions ]]--
@@ -43,38 +39,7 @@ function BubbleGrid.update( self, dt )
       self:addgridbubble( bubble, gridrowintx, gridcolintx )
       table.remove( self._bubblelist, bubbleidx )
 
-      -- Remove Bubble Chains Attached to the New Bubble --
-
-      -- TODO(JRC): Fix the bug in this code that causes the incorrect set of
-      -- bubbles to be popped.
-      local bubblestopop = {}
-      local bubblestotraverse = { self:_getcellid(gridrowintx, gridcolintx) }
-      while next( bubblestotraverse ) ~= nil do
-        local nextbubbleid = table.remove( bubblestotraverse )
-        local nextbubblerow, nextbubblecol = self:_getidcell( nextbubbleid )
-
-        bubblestopop[nextbubbleid] = { nextbubblerow, nextbubblecol }
-        local adjcells = self:_getadjcells( nextbubblerow, nextbubblecol )
-        for _, adjcell in ipairs( adjcells ) do
-          local adjcellrow, adjcellcol = adjcell[1], adjcell[2]
-          local adjcellid = self:_getcellid( adjcellrow, adjcellcol )
-          local adjbubble = self._bubblegrid[adjcellrow][adjcellcol]
-
-          if adjbubble ~= 0 and bubblestopop[adjcellid] == nil and
-              bubble:getcolor() == adjbubble:getcolor() then
-            table.insert( bubblestotraverse, self:_getcellid(adjcellrow, adjcellcol) )
-          end
-        end
-      end
-
-      if Utility.len( bubblestopop ) >= 3 then
-        for _, bubbleloc in pairs( bubblestopop ) do
-          local bubblerow, bubblecol = bubbleloc[1], bubbleloc[2]
-          self._bubblegrid[bubblerow][bubblecol] = 0
-        end
-
-        -- TODO(JRC): Remove all bubbles that aren't attached to the top.
-      end
+      self:popgridbubble( gridrowintx, gridcolintx )
     end
 
     bubble:update( dt )
@@ -111,6 +76,54 @@ function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
   bubble._pos = self:_getcellpos( gridrow, gridcol ) + Vector( 0.5, 0.5 )
 
   self._bubblegrid[gridrow][gridcol] = bubble
+end
+
+function BubbleGrid.popgridbubble( self, gridrow, gridcol )
+  local popbubble = self._bubblegrid[gridrow][gridcol]
+
+  local popnextfxn = function( r, c )
+    local nextcells = {}
+    for _, adjbubbleid in ipairs( self:_getadjbubbles(r, c) ) do
+      local adjrow, adjcol = self:_getidcell( adjbubbleid )
+      local adjbubble = self._bubblegrid[adjrow][adjcol]
+      if popbubble:getcolor() == adjbubble:getcolor() then
+        table.insert( nextcells, adjbubbleid )
+      end
+    end
+    return nextcells
+  end
+  local popqueryfxn = function( r, c )
+    return popbubble:getcolor() == self._bubblegrid[r][c]:getcolor()
+  end
+  local bubblestopop = self:_querycells( { self:_getcellid(gridrow, gridcol) },
+    popnextfxn, popqueryfxn )
+
+  if Utility.len( bubblestopop ) >= 3 then
+    for bubbleid, _ in pairs( bubblestopop ) do
+      local bubblerow, bubblecol = self:_getidcell( bubbleid )
+      self._bubblegrid[bubblerow][bubblecol] = 0
+    end
+
+    local rootbubbles = {}
+    for rootcol = 1, self:getw() do
+      local rootid = self:_getcellid( 1, rootcol )
+      if self._bubblegrid[1][rootcol] ~= 0 then table.insert( rootbubbles, rootid ) end
+    end
+
+    -- TODO(JRC): Fix the bug in this code that gets the wrong set of unrooted
+    -- bubbles in some cases (e.g. single rooted broken in the middle).
+    local rootedbubbles = self:_querycells( rootbubbles,
+      function( r, c ) return self:_getadjbubbles( r, c ) end,
+      function( r, c ) return true end )
+    local unrootedbubbles = self:_querycells( { 0 },
+      function( r, c ) return self:_getadjcells( r, c ) end,
+      function( r, c ) return rootedbubbles[self:_getcellid(r, c)] == nil end )
+
+    for unrootedid, _ in ipairs( unrootedbubbles ) do
+      local unrootedrow, unrootedcol = self:_getidcell( unrootedid )
+      self._bubblegrid[unrootedrow][unrootedcol] = 0
+    end
+  end
 end
 
 function BubbleGrid.clear( self )
@@ -161,6 +174,30 @@ function BubbleGrid._getgridintx( self, bubble )
   end
 end
 
+function BubbleGrid._querycells( self, startcells, nextfxn, queryfxn )
+  local queriedcells = {}
+
+  local visitedcells, cellstotraverse = {}, startcells
+  while next( cellstotraverse ) ~= nil do
+    local currcellid = table.remove( cellstotraverse )
+    local currcellrow, currcellcol = self:_getidcell( currcellid )
+
+    if visitedcells[currcellid] == nil then
+      visitedcells[currcellid] = true
+
+      if queryfxn( currcellrow, currcellcol ) then
+        queriedcells[currcellid] = true
+      end
+
+      for _, nextcellid in ipairs( nextfxn(currcellrow, currcellcol) ) do
+        table.insert( cellstotraverse, nextcellid )
+      end
+    end
+  end
+
+  return queriedcells
+end
+
 function BubbleGrid._getadjcells( self, cellrow, cellcol )
   local adjcells = {}
   local cellrightdelta = ( cellrow + 1 ) % 2
@@ -172,12 +209,27 @@ function BubbleGrid._getadjcells( self, cellrow, cellcol )
       local adjrow, adjcol = cellrow + cellrowdelta, cellcol + cellcoldelta
       if Utility.inrange( adjrow, 1, self:geth() ) and
           Utility.inrange( adjcol, 1, self:getw() ) then
-        table.insert( adjcells, {adjrow, adjcol} )
+        table.insert( adjcells, self:_getcellid(adjrow, adjcol) )
       end
     end
   end
 
   return adjcells
+end
+
+function BubbleGrid._getadjbubbles( self, cellrow, cellcol )
+  local adjbubbles = {}
+
+  for _, adjcellid in ipairs( self:_getadjcells(cellrow, cellcol) ) do
+    local adjcellrow, adjcellcol = self:_getidcell( adjcellid )
+
+    local adjbubble = self._bubblegrid[adjcellrow][adjcellcol]
+    if adjbubble ~= 0 then
+      table.insert( adjbubbles, self:_getcellid(adjcellrow, adjcellcol) )
+    end
+  end
+
+  return adjbubbles
 end
 
 function BubbleGrid._getposcell( self, pos )

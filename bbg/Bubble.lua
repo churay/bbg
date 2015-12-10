@@ -9,6 +9,8 @@ Bubble.COLORS = { {245, 53, 74}, {14, 176, 0}, {0, 168, 255}, {253, 246, 78} }
 
 function Bubble._init( self, pos, vel, colval )
   local colval = colval or math.random( #Bubble.COLORS ) - 1.0
+  local pos = pos or Vector( 0.0, 0.0 )
+  local vel = vel or Vector( 0.0, 0.0 )
 
   self._pos = pos
   self._vel = vel
