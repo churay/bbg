@@ -110,8 +110,6 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
       if self._bubblegrid[1][rootcol] ~= 0 then table.insert( rootbubbles, rootid ) end
     end
 
-    -- TODO(JRC): Fix the bug in this code that gets the wrong set of unrooted
-    -- bubbles in some cases (e.g. single rooted broken in the middle).
     local rootedbubbles = self:_querycells( rootbubbles,
       function( r, c ) return self:_getadjbubbles( r, c ) end,
       function( r, c ) return true end )
@@ -119,7 +117,7 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
       function( r, c ) return self:_getadjcells( r, c ) end,
       function( r, c ) return rootedbubbles[self:_getcellid(r, c)] == nil end )
 
-    for unrootedid, _ in ipairs( unrootedbubbles ) do
+    for unrootedid, _ in pairs( unrootedbubbles ) do
       local unrootedrow, unrootedcol = self:_getidcell( unrootedid )
       self._bubblegrid[unrootedrow][unrootedcol] = 0
     end
