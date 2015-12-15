@@ -9,6 +9,18 @@ function Utility.clamp( v, min, max )
   return math.max( math.min(v, max), min )
 end
 
+-- The following function needs to be implemented to facilitate string splitting
+-- (see http://lua-users.org/wiki/SplitJoin for details).
+
+function Utility.split( str, sep )
+  local sep = sep or "%s"
+  local splitlist = {}
+  for substr in string.gmatch( str, "([^" .. sep .. "]+)" ) do
+    table.insert( splitlist, substr )
+  end
+  return splitlist
+end
+
 -- The following function needs to be implemented to determine the number of
 -- keys in a dictionary (see http://stackoverflow.com/a/2705804).
 

@@ -11,16 +11,12 @@ local BubbleBoard = Class()
 
 --[[ Constructors ]]--
 
-function BubbleBoard._init( self, boardseed, gridwidth, gridheight )
-  local boardseed = boardseed or os.time()
-  local gridwidth = gridwidth or 8
-  local gridheight = gridheight or 11
+function BubbleBoard._init( self, gridseed, queueseed )
+  self._bubblegrid = BubbleGrid( gridseed or 0 )
+  -- self._bubblequeue = BubbleQueue( queueseed )
+  self._shooter = Shooter( Vector(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
 
-  self._bubblegrid = BubbleGrid( gridwidth, gridheight )
-  self._shooter = Shooter( Vector(gridwidth / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
-  self._bubbleseed = boardseed
-
-  -- TODO(JRC): Upgrade this to a Bubble queue.
+  -- TODO(JRC): Upgrade this to a Bubble queue; pass the queue seed.
   self._nextbubble = Bubble( Vector(self._shooter._pos:getxy()), Vector(0.0, 0.0) )
 end
 

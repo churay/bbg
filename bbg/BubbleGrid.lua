@@ -9,16 +9,8 @@ local BubbleGrid = Class()
 
 --[[ Constructors ]]--
 
--- TODO(JRC): Add a capability to specify a random seed for an initial configuration.
-function BubbleGrid._init( self, width, height )
-  self._gridbox = Box( 0.0, 0.0, width, height )
-
-  self._bubblelist = {}
-  self._bubblegrid = {}
-  self:clear()
-
-  self._bubblegrid[0] = {}
-  for sentcol = 1, self:getw() do self:addgridbubble( Bubble(), 0, sentcol ) end
+function BubbleGrid._init( self, gridseed )
+  self:loadfromseed( gridseed )
 end
 
 --[[ Public Functions ]]--
@@ -124,13 +116,38 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
   end
 end
 
-function BubbleGrid.clear( self )
-  self._bubbles = {}
+function BubbleGrid.savetoseed( self, gridseed )
+  -- TODO(JRC): Implement this function.
+end
 
-  for row = 1, self:geth() do
-    self._bubblegrid[row] = {}
-    for col = 1, self:getw() do
-      self._bubblegrid[row][col] = 0
+-- TODO(JRC): Refine this method.
+function BubbleGrid.loadfromseed( self, gridseed )
+  self._bubblelist, self._bubblegrid = {}, {}
+
+  local seedfilename = love.filesystem.isFile( self:_getseedfilename(gridseed) ) and
+    self:_getseedfilename( gridseed ) or self:_getseedfilename( "0" )
+  local seedfile = love.filesystem.newFile( seedfilename )
+
+  if not seedfile:open( "r" ) then return nil end
+  for gridline in seedfile:lines() do
+    local linebubbles = {}
+    for _, linebubble in ipairs( Utility.split(gridline, " ") ) do
+      table.insert( linebubbles, tonumber(linebubble) )
+    end
+    table.insert( self._bubblegrid, linebubbles )
+  end
+
+  self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1], #self._bubblegrid )
+
+  self._bubblegrid[0] = {}
+  for sentcol = 1, self:getw()-1 do self:addgridbubble( Bubble(), 0, sentcol ) end
+
+  for gridrow = 1, self:geth() do
+    for gridcol = 1, self:getw() - 1 * ( (gridrow + 1) % 2 ) do
+      local bubbleval = self._bubblegrid[gridrow][gridcol]
+      if bubbleval ~= 0 then
+        self:addgridbubble( Bubble(nil, nil, bubbleval), gridrow, gridcol )
+      end
     end
   end
 end
@@ -206,7 +223,7 @@ function BubbleGrid._getadjcells( self, cellrow, cellcol )
     for _, cellcoldelta in ipairs( cellcoldeltas ) do
       local adjrow, adjcol = cellrow + cellrowdelta, cellcol + cellcoldelta
       if Utility.inrange( adjrow, 1, self:geth() ) and
-          Utility.inrange( adjcol, 1, self:getw() ) then
+          Utility.inrange( adjcol, 1, self:getw() - 1 * ( (adjrow + 1) % 2 ) ) then
         table.insert( adjcells, self:_getcellid(adjrow, adjcol) )
       end
     end
@@ -250,6 +267,10 @@ end
 
 function BubbleGrid._getidcell( self, cellid )
   return math.floor( cellid / self:getw() ) + 1, ( cellid % self:getw() ) + 1
+end
+
+function BubbleGrid._getseedfilename( self, gridseed )
+  return "boards/" .. gridseed .. ".txt"
 end
 
 return BubbleGrid

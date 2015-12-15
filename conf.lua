@@ -1,4 +1,8 @@
 function love.conf( config )
+  config.identity = "bbg"
+  config.version = "0.9.2"
+  config.console = false
+
   config.window.title = "bbg"
   config.window.width = 640
   config.window.height = 480
