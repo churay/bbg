@@ -12,7 +12,10 @@ local BubbleBoard = Class()
 --[[ Constructors ]]--
 
 function BubbleBoard._init( self, gridseed, queueseed )
-  self._bubblegrid = BubbleGrid( gridseed or 0 )
+  local gridseed = gridseed or 0
+  local queueseed = queueseed or os.time()
+
+  self._bubblegrid = BubbleGrid( gridseed )
   -- self._bubblequeue = BubbleQueue( queueseed )
   self._shooter = Shooter( Vector(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
 
