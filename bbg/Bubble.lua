@@ -10,11 +10,11 @@ Bubble.COLORS = { {245, 53, 74}, {14, 176, 0}, {0, 168, 255}, {253, 246, 78} }
 function Bubble._init( self, pos, vel, colval )
   local pos = pos or Vector( 0.0, 0.0 )
   local vel = vel or Vector( 0.0, 0.0 )
-  local colval = colval or math.random( #Bubble.COLORS ) - 1.0
+  local colval = colval or math.random( #Bubble.COLORS )
 
   self._pos = pos
   self._vel = vel
-  self._color = Bubble.COLORS[(colval % #Bubble.COLORS) + 1.0]
+  self._color = Bubble.COLORS[colval]
 end
 
 --[[ Public Functions ]]--

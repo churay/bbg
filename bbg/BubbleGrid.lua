@@ -120,21 +120,29 @@ function BubbleGrid.savetoseed( self, gridseed )
   -- TODO(JRC): Implement this function.
 end
 
--- TODO(JRC): Refine this method.
 function BubbleGrid.loadfromseed( self, gridseed )
   self._bubblelist, self._bubblegrid = {}, {}
 
-  local seedfilename = love.filesystem.isFile( self:_getseedfilename(gridseed) ) and
-    self:_getseedfilename( gridseed ) or self:_getseedfilename( "0" )
+  local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
 
-  if not seedfile:open( "r" ) then return nil end
-  for gridline in seedfile:lines() do
-    local linebubbles = {}
-    for _, linebubble in ipairs( Utility.split(gridline, " ") ) do
-      table.insert( linebubbles, tonumber(linebubble) )
+  if seedfile:open( "r" ) then
+    for gridline in seedfile:lines() do
+      local linebubbles = {}
+      for _, linebubble in ipairs( Utility.split(gridline, " ") ) do
+        table.insert( linebubbles, tonumber(linebubble) )
+      end
+      table.insert( self._bubblegrid, linebubbles )
     end
-    table.insert( self._bubblegrid, linebubbles )
+  else
+    -- TODO(JRC): Improve the random generation here.
+    for gridrow = 1, 11 do
+      local bubblerow = {}
+      for gridcol = 1, 8 - 1 * ( (gridrow + 1) % 2 ) do
+        table.insert( bubblerow, gridrow <= 4 and math.random(#Bubble.COLORS) or 0 )
+      end
+      table.insert( self._bubblegrid, bubblerow )
+    end
   end
 
   self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1], #self._bubblegrid )
@@ -142,6 +150,8 @@ function BubbleGrid.loadfromseed( self, gridseed )
   self._bubblegrid[0] = {}
   for sentcol = 1, self:getw()-1 do self:addgridbubble( Bubble(), 0, sentcol ) end
 
+  -- TODO(JRC): Create an iterator that iterates over all of the rows/columns
+  -- of a grid (abstracts the weird hex behavior and removes duplication).
   for gridrow = 1, self:geth() do
     for gridcol = 1, self:getw() - 1 * ( (gridrow + 1) % 2 ) do
       local bubbleval = self._bubblegrid[gridrow][gridcol]
