@@ -1,6 +1,6 @@
 function love.conf( config )
   config.identity = "bbg"
-  config.version = "0.9.2"
+  config.version = "0.10.0"
   config.console = false
 
   config.window.title = "bbg"
