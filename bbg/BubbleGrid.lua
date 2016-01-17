@@ -70,10 +70,14 @@ function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
   self._bubblegrid[gridrow][gridcol] = bubble
 end
 
+function BubbleGrid.getgridbubble( self, gridrow, gridcol )
+  return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
+end
+
 function BubbleGrid.popgridbubble( self, gridrow, gridcol )
   local popbubble = self._bubblegrid[gridrow][gridcol]
 
-  local popnextfxn = function( r, c )
+  local function popnextfxn( r, c )
     local nextcells = {}
     for _, adjbubbleid in ipairs( self:_getadjbubbles(r, c) ) do
       local adjrow, adjcol = self:_getidcell( adjbubbleid )
@@ -84,7 +88,7 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
     end
     return nextcells
   end
-  local popqueryfxn = function( r, c )
+  local function popqueryfxn( r, c )
     return popbubble:getcolor() == self._bubblegrid[r][c]:getcolor()
   end
   local bubblestopop = self:_querycells( { self:_getcellid(gridrow, gridcol) },
@@ -150,14 +154,9 @@ function BubbleGrid.loadfromseed( self, gridseed )
   self._bubblegrid[0] = {}
   for sentcol = 1, self:getw()-1 do self:addgridbubble( Bubble(), 0, sentcol ) end
 
-  -- TODO(JRC): Create an iterator that iterates over all of the rows/columns
-  -- of a grid (abstracts the weird hex behavior and removes duplication).
-  for gridrow = 1, self:geth() do
-    for gridcol = 1, self:getw() - 1 * ( (gridrow + 1) % 2 ) do
-      local bubbleval = self._bubblegrid[gridrow][gridcol]
-      if bubbleval ~= 0 then
-        self:addgridbubble( Bubble(nil, nil, bubbleval), gridrow, gridcol )
-      end
+  for _, cellrow, cellcol, cellvalue in self:_iteratecells() do
+    if cellvalue ~= 0 then
+      self:addgridbubble( Bubble(nil, nil, cellvalue), cellrow, cellcol )
     end
   end
 end
@@ -189,7 +188,7 @@ function BubbleGrid._getgridintx( self, bubble )
 
   for _, bubblecorner in ipairs( bubblecorners ) do
     local intxrow, intxcol = self:_getposcell( bubblecorner )
-    local intxbubble = self._bubblegrid[intxrow] and self._bubblegrid[intxrow][intxcol]
+    local intxbubble = self:getgridbubble( intxrow, intxcol )
 
     if intxbubble ~= nil and intxbubble ~= 0 then
       if( bubble:getcenter() - intxbubble:getcenter() ):magnitude() < 2.0 then
@@ -223,21 +222,21 @@ function BubbleGrid._querycells( self, startcells, nextfxn, queryfxn )
   return queriedcells
 end
 
---[[
-function BubbleGrid._iteratecells( self, gridwidth, gridheight )
-  local gridrow, gridcol = 0, 0
+function BubbleGrid._iteratecells( self )
+  local function itercells( bubblegrid, currcellid )
+    local isnextvalid = self:_iscellvalid( self:_getidcell(currcellid + 1) )
 
-  return function()
-    local gridrowmax = gridheight
-    local gridcolmax = 
+    local nextcellid = currcellid + ( isnextvalid and 1 or 2 )
+    local nextcellrow, nextcellcol = bubblegrid:_getidcell( nextcellid )
 
-    gridwidth - 1 * ( (gridrow + 1) % 2 )
-
-    gridcol = gridrow ==  and 1 or 0
-    gridrow = gridcol
+    local nextcell = self:getgridbubble( nextcellrow, nextcellcol )
+    if nextcell then
+      return nextcellid, nextcellrow, nextcellcol, nextcell
+    end
   end
+
+  return itercells, self, -1
 end
-]]--
 
 function BubbleGrid._getadjcells( self, cellrow, cellcol )
   local adjcells = {}
@@ -246,10 +245,10 @@ function BubbleGrid._getadjcells( self, cellrow, cellcol )
   for cellrowdelta = -1, 1 do
     local cellcoldeltas = cellrowdelta == 0 and { -1, 1 } or
       { cellrightdelta - 1, cellrightdelta }
+
     for _, cellcoldelta in ipairs( cellcoldeltas ) do
       local adjrow, adjcol = cellrow + cellrowdelta, cellcol + cellcoldelta
-      if Utility.inrange( adjrow, 1, self:geth() ) and
-          Utility.inrange( adjcol, 1, self:getw() - 1 * ( (adjrow + 1) % 2 ) ) then
+      if self:_iscellvalid( adjrow, adjcol ) then
         table.insert( adjcells, self:_getcellid(adjrow, adjcol) )
       end
     end
@@ -293,6 +292,14 @@ end
 
 function BubbleGrid._getidcell( self, cellid )
   return math.floor( cellid / self:getw() ) + 1, ( cellid % self:getw() ) + 1
+end
+
+function BubbleGrid._iscellvalid( self, cellrow, cellcol )
+  local maxcellrow = self:geth()
+  local maxcellcol = self:getw() - ( (cellrow % 2 == 0) and 1 or 0 )
+
+  return Utility.inrange( cellrow, 1, maxcellrow ) and
+    Utility.inrange( cellcol, 1, maxcellcol )
 end
 
 function BubbleGrid._getseedfilename( self, gridseed )
