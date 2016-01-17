@@ -33,7 +33,7 @@ function love.run()
     if love.getinput then love.getinput() end
     if love.update then love.update( timedelta ) end
     if love.window and love.graphics and love.window.isCreated() then
-      love.graphics.clear()
+      love.graphics.clear( 0, 0, 0 )
       love.draw()
       love.graphics.present()
     end
@@ -46,17 +46,17 @@ function love.load()
   board = bbg.BubbleBoard( 0, os.time() )
 end
 
-function love.keypressed( key, isrepeat )
+function love.keypressed( key, scancode, isrepeat )
   if key == "q" then love.event.quit() end
 
   -- TODO(JRC): Fix the exploit that allows players to rotate at double speed
   -- if they press both of the same direction key at the same time.
-  if key == " " then board:shootbubble() end
+  if key == "space" then board:shootbubble() end
   if key == "left" or key == "h" then board:rotateshooter( 1.0 ) end
   if key == "right" or key == "l" then board:rotateshooter( -1.0 ) end
 end
 
-function love.keyreleased( key )
+function love.keyreleased( key, scancode )
   if key == "left" or key == "h" then board:rotateshooter( -1.0 ) end
   if key == "right" or key == "l" then board:rotateshooter( 1.0 ) end
 end
@@ -68,7 +68,7 @@ end
 function love.draw()
   -- NOTE(JRC): The board scale is adjustd by the inverted window scale to
   -- compensate for the difference this causes in window coordinates.
-  local window = { width=love.window.getWidth(), height=love.window.getHeight() }
+  local window = { width=love.graphics.getWidth(), height=love.graphics.getHeight() }
   local boardscale = (window.height / window.width) * (board:getw() / board:geth())
 
   love.graphics.push()

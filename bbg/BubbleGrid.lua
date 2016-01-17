@@ -223,6 +223,22 @@ function BubbleGrid._querycells( self, startcells, nextfxn, queryfxn )
   return queriedcells
 end
 
+--[[
+function BubbleGrid._iteratecells( self, gridwidth, gridheight )
+  local gridrow, gridcol = 0, 0
+
+  return function()
+    local gridrowmax = gridheight
+    local gridcolmax = 
+
+    gridwidth - 1 * ( (gridrow + 1) % 2 )
+
+    gridcol = gridrow ==  and 1 or 0
+    gridrow = gridcol
+  end
+end
+]]--
+
 function BubbleGrid._getadjcells( self, cellrow, cellcol )
   local adjcells = {}
   local cellrightdelta = ( cellrow + 1 ) % 2
