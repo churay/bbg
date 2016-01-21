@@ -1,11 +1,11 @@
 local Class = require( "Class" )
 
 local Vector = require( "Vector" )
-local Queue = require( "Queue" )
 local Box = require( "Box" )
-
 local Bubble = require( "Bubble" )
+
 local Shooter = require( "Shooter" )
+local BubbleQueue = require( "BubbleQueue" )
 local BubbleGrid = require( "BubbleGrid" )
 local BubbleBoard = Class()
 
@@ -16,11 +16,9 @@ function BubbleBoard._init( self, gridseed, queueseed )
   local queueseed = queueseed or os.time()
 
   self._bubblegrid = BubbleGrid( gridseed )
-  -- self._bubblequeue = BubbleQueue( queueseed )
   self._shooter = Shooter( Vector(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
-
-  -- TODO(JRC): Upgrade this to a Bubble queue; pass the queue seed.
-  self._nextbubble = Bubble( Vector(self._shooter._pos:getxy()), Vector(0.0, 0.0) )
+  self._bubblequeue = BubbleQueue( Vector(0.5, 0.5), 2, queueseed )
+  self._nextbubble = self:_getnextbubble()
 end
 
 --[[ Public Functions ]]--
@@ -28,6 +26,7 @@ end
 function BubbleBoard.update( self, dt )
   self._bubblegrid:update( dt )
   self._shooter:update( dt )
+  self._bubblequeue:update( dt )
 end
 
 function BubbleBoard.draw( self, canvas )
@@ -48,12 +47,12 @@ function BubbleBoard.draw( self, canvas )
   self._bubblegrid:draw( canvas )
   canvas.pop()
 
-  -- TODO(JRC): Draw the next bubble, the bubble queue, and the outlines for
-  -- the board.
   canvas.push()
   canvas.scale( 1.0, queueheight / totalheight )
   canvas.scale( 1.0 / totalwidth, 1.0 / queueheight )
   self._shooter:draw( canvas )
+  self._bubblequeue:draw( canvas )
+  self._nextbubble:draw( canvas )
   canvas.pop()
 
   canvas.pop()
@@ -61,7 +60,7 @@ end
 
 function BubbleBoard.shootbubble( self )
   local nextbubble = self._nextbubble
-  self._nextbubble = Bubble( Vector(self._shooter._pos:getxy()), Vector(0.0, 0.0) )
+  self._nextbubble = self:_getnextbubble()
 
   nextbubble._pos = Vector( nextbubble._pos:getx(), -nextbubble._pos:gety() )
   nextbubble._vel = self._shooter:tovector()
@@ -77,5 +76,14 @@ end
 
 function BubbleBoard.getw( self ) return self._bubblegrid:getw() end
 function BubbleBoard.geth( self ) return self._bubblegrid:geth() + 2 end
+
+--[[ Private Functions ]]--
+
+function BubbleBoard._getnextbubble( self )
+  local nextbubble = self._bubblequeue:dequeue()
+  nextbubble._pos = Vector( self._shooter._pos:getxy() )
+
+  return nextbubble
+end
 
 return BubbleBoard
