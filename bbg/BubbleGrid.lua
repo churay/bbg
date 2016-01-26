@@ -60,6 +60,10 @@ function BubbleGrid.draw( self, canvas )
   canvas.pop()
 end
 
+function BubbleGrid.getgridbubble( self, gridrow, gridcol )
+  return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
+end
+
 function BubbleGrid.addbubble( self, bubble )
   table.insert( self._bubblelist, bubble )
 end
@@ -70,8 +74,20 @@ function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
   self._bubblegrid[gridrow][gridcol] = bubble
 end
 
-function BubbleGrid.getgridbubble( self, gridrow, gridcol )
-  return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
+function BubbleGrid.addgridrow( self, rowvals )
+  -- TODO(JRC): Implement this function.  This implementation will require some
+  -- changes to be made to the "BubbleGrid" class because it will require the
+  -- top row to be interchangable offset (i.e. even rows offset or odd rows offset)
+  -- so that the new row can change the offset.
+
+  -- NOTE(JRC): The top row should be offset along the horizontal, but
+  -- it should not be moved.
+  --
+  -- Move all rows down one (start at h and go back to 1)
+  -- offset all of the bubbles in the grid by Vector( 0.0, -1.0 )
+  -- generate bubbles for all of the given row values (should be w values)
+  -- add grid bubbles for each of these
+  -- somehow indicate at some point that the row entries are offset now
 end
 
 function BubbleGrid.popgridbubble( self, gridrow, gridcol )
@@ -240,7 +256,7 @@ end
 
 function BubbleGrid._getadjcells( self, cellrow, cellcol )
   local adjcells = {}
-  local cellrightdelta = ( cellrow + 1 ) % 2
+  local cellrightdelta = self:_isrowshort( cellrow )
 
   for cellrowdelta = -1, 1 do
     local cellcoldeltas = cellrowdelta == 0 and { -1, 1 } or
@@ -274,13 +290,13 @@ end
 
 function BubbleGrid._getposcell( self, pos )
   local cellrow = self:geth() - math.ceil( pos:gety() ) + 1
-  local cellcol = math.ceil( pos:getx() - 0.5 * ((cellrow + 1) % 2) )
+  local cellcol = math.ceil( pos:getx() - 0.5 * self:_isrowshort(cellrow) )
 
   return cellrow, cellcol
 end
 
 function BubbleGrid._getcellpos( self, cellrow, cellcol )
-  local cellminx = cellcol - 1 + 0.5 * ( (cellrow + 1) % 2 )
+  local cellminx = cellcol - 1 + 0.5 * self:_isrowshort( cellrow )
   local cellminy = self:geth() - cellrow
 
   return Vector( cellminx, cellminy )
@@ -296,10 +312,14 @@ end
 
 function BubbleGrid._iscellvalid( self, cellrow, cellcol )
   local maxcellrow = self:geth()
-  local maxcellcol = self:getw() - ( (cellrow % 2 == 0) and 1 or 0 )
+  local maxcellcol = self:getw() - self:_isrowshort( cellrow )
 
   return Utility.inrange( cellrow, 1, maxcellrow ) and
     Utility.inrange( cellcol, 1, maxcellcol )
+end
+
+function BubbleGrid._isrowshort( self, gridrow )
+  return ( self:getgridbubble(gridrow, self:getw()) == nil ) and 1 or 0
 end
 
 function BubbleGrid._getseedfilename( self, gridseed )
