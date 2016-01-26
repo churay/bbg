@@ -74,20 +74,30 @@ function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
   self._bubblegrid[gridrow][gridcol] = bubble
 end
 
+-- TODO(JRC): Clean up this function so that it isn't so hacky.
 function BubbleGrid.addgridrow( self, rowvals )
-  -- TODO(JRC): Implement this function.  This implementation will require some
-  -- changes to be made to the "BubbleGrid" class because it will require the
-  -- top row to be interchangable offset (i.e. even rows offset or odd rows offset)
-  -- so that the new row can change the offset.
+  self._rowoffset = self._rowoffset + 1
 
-  -- NOTE(JRC): The top row should be offset along the horizontal, but
-  -- it should not be moved.
-  --
-  -- Move all rows down one (start at h and go back to 1)
-  -- offset all of the bubbles in the grid by Vector( 0.0, -1.0 )
-  -- generate bubbles for all of the given row values (should be w values)
-  -- add grid bubbles for each of these
-  -- somehow indicate at some point that the row entries are offset now
+  for gridrow = self:geth(), 2, -1 do
+    self._bubblegrid[gridrow] = self._bubblegrid[gridrow - 1]
+    for gridcol = 1, self:getw() - self:_isrowshort( gridrow ), 1 do
+      local gridbubble = self:getgridbubble( gridrow, gridcol )
+      if gridbubble ~= 0 then
+        gridbubble._pos = gridbubble._pos + Vector( 0.0, -1.0 )
+      end
+    end
+  end
+
+  local sentoffset = self:_isrowshort( 0 ) and 0.5 or -0.5
+  for gridcol = 1, self:getw() - self:_isrowshort( 0 ), 1 do
+    local sentbubble = self:getgridbubble( 0, gridcol )
+    sentbubble._pos = sentbubble._pos + Vector( sentoffset, 0.0 )
+  end
+
+  self._bubblegrid[1] = {}
+  for gridcol = 1, self:getw() - self:_isrowshort( 1 ), 1 do
+    self:addgridbubble( Bubble(nil, nil, rowvals[gridcol]), 1, gridcol )
+  end
 end
 
 function BubbleGrid.popgridbubble( self, gridrow, gridcol )
@@ -142,6 +152,7 @@ end
 
 function BubbleGrid.loadfromseed( self, gridseed )
   self._bubblelist, self._bubblegrid = {}, {}
+  self._rowoffset = 0
 
   local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
@@ -168,7 +179,7 @@ function BubbleGrid.loadfromseed( self, gridseed )
   self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1], #self._bubblegrid )
 
   self._bubblegrid[0] = {}
-  for sentcol = 1, self:getw()-1 do self:addgridbubble( Bubble(), 0, sentcol ) end
+  for sentcol = 1, self:getw() do self:addgridbubble( Bubble(), 0, sentcol ) end
 
   for _, cellrow, cellcol, cellvalue in self:_iteratecells() do
     if cellvalue ~= 0 then
@@ -319,7 +330,7 @@ function BubbleGrid._iscellvalid( self, cellrow, cellcol )
 end
 
 function BubbleGrid._isrowshort( self, gridrow )
-  return ( self:getgridbubble(gridrow, self:getw()) == nil ) and 1 or 0
+  return ( self._rowoffset + gridrow + 1 ) % 2
 end
 
 function BubbleGrid._getseedfilename( self, gridseed )
