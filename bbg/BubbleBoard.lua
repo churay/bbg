@@ -20,18 +20,29 @@ function BubbleBoard._init( self, gridseed, queueseed )
   self._bubblequeue = BubbleQueue( Vector(0.5, 0.5), 2, queueseed )
   self._nextbubble = self:_getnextbubble()
 
-  --[[
-  self._nextrowcounter = 4
-  self._nextrowrng = love.math.newRandomGenerator( queueseed * 7 )
-  ]]--
+  -- TODO(JRC): This should be refactored so that it's a bit less ugly.
+  self._numshotbubbles = 0
+  self._rng = love.math.newRandomGenerator( queueseed * 7 )
 end
 
 --[[ Public Functions ]]--
 
 function BubbleBoard.update( self, dt )
+  local hadmotion = self._bubblegrid:hasmotion()
+
   self._bubblegrid:update( dt )
   self._shooter:update( dt )
   self._bubblequeue:update( dt )
+
+  -- TODO(JRC): This should be refactored so that it's a bit less ugly.
+  local hasmotion = self._bubblegrid:hasmotion()
+  if hadmotion and not hasmotion and ( self._numshotbubbles % 4 ) == 0 then
+    local nextrowvals = {}
+    for validx = 1, self:getw(), 1 do
+      table.insert( nextrowvals, self._rng:random(#Bubble.COLORS) )
+    end
+    self._bubblegrid:addgridrow( nextrowvals )
+  end
 end
 
 function BubbleBoard.draw( self, canvas )
@@ -64,19 +75,8 @@ function BubbleBoard.draw( self, canvas )
 end
 
 function BubbleBoard.shootbubble( self )
-  --[[
-  self._nextrowcounter = self._nextrowcounter - 1
-  if self._nextrowcounter == 0 then
-    local nextrowvals = {}
-    for validx = 1, self:getw(), 1 do
-      table.insert( nextrowvals, self._nextrowrng:random(#Bubble.COLORS)  )
-    end
-
-    self._bubblegrid:addgridrow( nextrowvals )
-
-    self._nextrowcounter = 4
-  end
-  ]]--
+  -- TODO(JRC): Remove this so that multiple bubbles can be active at once.
+  if self._bubblegrid:hasmotion() then return end
 
   local nextbubble = self._nextbubble
   self._nextbubble = self:_getnextbubble()
@@ -85,6 +85,7 @@ function BubbleBoard.shootbubble( self )
   nextbubble._vel = self._shooter:tovector()
 
   self._bubblegrid:addbubble( nextbubble )
+  self._numshotbubbles = self._numshotbubbles + 1
 end
 
 function BubbleBoard.rotateshooter( self, rotdir )

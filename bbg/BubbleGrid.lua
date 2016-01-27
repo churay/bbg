@@ -192,6 +192,7 @@ end
 
 function BubbleGrid.getw( self ) return self._gridbox:getw() end
 function BubbleGrid.geth( self ) return self._gridbox:geth() end
+function BubbleGrid.hasmotion( self ) return #self._bubblelist > 0 end
 
 --[[ Private Functions ]]--
 
@@ -218,7 +219,7 @@ function BubbleGrid._getgridintx( self, bubble )
     local intxbubble = self:getgridbubble( intxrow, intxcol )
 
     if intxbubble ~= nil and intxbubble ~= 0 then
-      if( bubble:getcenter() - intxbubble:getcenter() ):magnitude() < 2.0 then
+      if ( bubble:getcenter() - intxbubble:getcenter() ):magnitude() < 2.0 then
         return self:_getposcell( bubble:getcenter() )
       end
     end

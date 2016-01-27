@@ -12,9 +12,9 @@ function BubbleQueue._init( self, pos, length, seed )
   local length = length or 1
   local seed = seed or os.time()
 
+  self._pos = pos
   self._queue = Queue()
   self._rng = love.math.newRandomGenerator( seed )
-  self._pos = pos
 
   for queueidx = 1, length, 1 do self:_enqueue() end
 end
