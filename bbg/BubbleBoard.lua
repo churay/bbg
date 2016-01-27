@@ -19,6 +19,11 @@ function BubbleBoard._init( self, gridseed, queueseed )
   self._shooter = Shooter( Vector(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
   self._bubblequeue = BubbleQueue( Vector(0.5, 0.5), 2, queueseed )
   self._nextbubble = self:_getnextbubble()
+
+  --[[
+  self._nextrowcounter = 4
+  self._nextrowrng = love.math.newRandomGenerator( queueseed * 7 )
+  ]]--
 end
 
 --[[ Public Functions ]]--
@@ -59,6 +64,20 @@ function BubbleBoard.draw( self, canvas )
 end
 
 function BubbleBoard.shootbubble( self )
+  --[[
+  self._nextrowcounter = self._nextrowcounter - 1
+  if self._nextrowcounter == 0 then
+    local nextrowvals = {}
+    for validx = 1, self:getw(), 1 do
+      table.insert( nextrowvals, self._nextrowrng:random(#Bubble.COLORS)  )
+    end
+
+    self._bubblegrid:addgridrow( nextrowvals )
+
+    self._nextrowcounter = 4
+  end
+  ]]--
+
   local nextbubble = self._nextbubble
   self._nextbubble = self:_getnextbubble()
 
