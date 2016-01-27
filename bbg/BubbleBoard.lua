@@ -69,6 +69,16 @@ function BubbleBoard.draw( self, canvas )
   self._shooter:draw( canvas )
   self._bubblequeue:draw( canvas )
   self._nextbubble:draw( canvas )
+
+  -- TODO(JRC): Move this logic to its own class if this ends up being the
+  -- final representation for the number of shots remaining until adjustment.
+  canvas.setColor( 0, 0, 0 )
+  canvas.setLineWidth( 3.0e-1 )
+  for shotlineidx = 1, 4 - (self._numshotbubbles % 4), 1 do
+    local shotlinex = ( 3.0 / 4.0 ) * totalwidth + 0.5 * ( shotlineidx - 1 )
+    canvas.line( shotlinex, 0.5, shotlinex, 1.5 )
+  end
+  canvas.setLineWidth( 1.0e-1 )
   canvas.pop()
 
   canvas.pop()
