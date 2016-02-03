@@ -71,8 +71,7 @@ function BubbleGrid.getgridbubble( self, gridrow, gridcol )
   return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
 end
 
--- TODO(JRC): Clean up this function so that it isn't so hacky.
-function BubbleGrid.addgridrow( self, rowvals )
+function BubbleGrid.addgridrow( self, rowbubbles )
   self._rowoffset = self._rowoffset + 1
 
   for gridrow = self:geth() + 1, 2, -1 do
@@ -93,7 +92,7 @@ function BubbleGrid.addgridrow( self, rowvals )
 
   self._bubblegrid[1] = {}
   for gridcol = 1, self:getw() - self:_isrowshort( 1 ) do
-    self:addgridbubble( Bubble(nil, nil, rowvals[gridcol]), 1, gridcol )
+    self:addgridbubble( rowbubbles[gridcol], 1, gridcol )
   end
 end
 
@@ -194,11 +193,7 @@ function BubbleGrid.getw( self ) return self._gridbox:getw() end
 function BubbleGrid.geth( self ) return self._gridbox:geth() end
 function BubbleGrid.hasmotion( self ) return #self._bubblelist > 0 end
 function BubbleGrid.hasoverflow( self )
-  for sentcol = 1, self:getw() do
-    local sentbubble = self:getgridbubble( self:geth() + 1, sentcol )
-    if sentbubble ~= 0 and sentbubble ~= nil then return true end
-  end
-  return false
+  return Utility.any( self._bubblegrid[self:geth() + 1], function(k, v) return v ~= 0 end )
 end
 
 --[[ Private Functions ]]--

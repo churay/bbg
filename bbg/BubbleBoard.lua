@@ -17,12 +17,12 @@ function BubbleBoard._init( self, gridseed, queueseed )
 
   self._bubblegrid = BubbleGrid( gridseed )
   self._shooter = Shooter( Vector(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
-  self._bubblequeue = BubbleQueue( Vector(0.5, 0.5), 2, queueseed )
-  self._nextbubble = self:_getnextbubble()
 
-  -- TODO(JRC): This should be refactored so that it's a bit less ugly.
-  self._numshotbubbles = 0
-  self._rng = love.math.newRandomGenerator( queueseed * 7 )
+  self._boardqueue = BubbleQueue( Vector(0.0, 0.0), queueseed * 7, 8 )
+  self._shooterqueue = BubbleQueue( Vector(0.5, 0.5), queueseed, 2 )
+
+  self._numshots = 0
+  self._nextbubble = self:_getnextbubble()
 end
 
 --[[ Public Functions ]]--
@@ -32,16 +32,11 @@ function BubbleBoard.update( self, dt )
 
   self._bubblegrid:update( dt )
   self._shooter:update( dt )
-  self._bubblequeue:update( dt )
+  self._shooterqueue:update( dt )
 
-  -- TODO(JRC): This should be refactored so that it's a bit less ugly.
   local hasmotion = self._bubblegrid:hasmotion()
-  if hadmotion and not hasmotion and ( self._numshotbubbles % 4 ) == 0 then
-    local nextrowvals = {}
-    for validx = 1, self:getw() do
-      table.insert( nextrowvals, self._rng:random(#Bubble.COLORS) )
-    end
-    self._bubblegrid:addgridrow( nextrowvals )
+  if hadmotion and not hasmotion and ( self._numshots % 4 ) == 0 then
+    self._bubblegrid:addgridrow( self._boardqueue:dequeueall(true) )
   end
 end
 
@@ -67,14 +62,14 @@ function BubbleBoard.draw( self, canvas )
   canvas.scale( 1.0, queueheight / totalheight )
   canvas.scale( 1.0 / totalwidth, 1.0 / queueheight )
   self._shooter:draw( canvas )
-  self._bubblequeue:draw( canvas )
+  self._shooterqueue:draw( canvas )
   self._nextbubble:draw( canvas )
 
   -- TODO(JRC): Move this logic to its own class if this ends up being the
   -- final representation for the number of shots remaining until adjustment.
   canvas.setColor( 0, 0, 0 )
   canvas.setLineWidth( 3.0e-1 )
-  for shotlineidx = 1, 4 - (self._numshotbubbles % 4) do
+  for shotlineidx = 1, 4 - ( self._numshots % 4 ) do
     local shotlinex = ( 3.0 / 4.0 ) * totalwidth + 0.5 * ( shotlineidx - 1 )
     canvas.line( shotlinex, 0.5, shotlinex, 1.5 )
   end
@@ -95,7 +90,7 @@ function BubbleBoard.shootbubble( self )
   nextbubble._vel = self._shooter:tovector()
 
   self._bubblegrid:addbubble( nextbubble )
-  self._numshotbubbles = self._numshotbubbles + 1
+  self._numshots = self._numshots + 1
 end
 
 function BubbleBoard.rotateshooter( self, rotdir )
@@ -111,9 +106,8 @@ function BubbleBoard.hasoverflow( self ) return self._bubblegrid:hasoverflow() e
 --[[ Private Functions ]]--
 
 function BubbleBoard._getnextbubble( self )
-  local nextbubble = self._bubblequeue:dequeue()
+  local nextbubble = self._shooterqueue:dequeue( true )
   nextbubble._pos = Vector( self._shooter._pos:getxy() )
-
   return nextbubble
 end
 

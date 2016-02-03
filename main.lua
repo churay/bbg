@@ -43,7 +43,7 @@ function love.run()
 end
 
 function love.load()
-  board = bbg.BubbleBoard( 0, os.time() )
+  board = bbg.BubbleBoard( 3, os.time() )
 end
 
 function love.keypressed( key, scancode, isrepeat )

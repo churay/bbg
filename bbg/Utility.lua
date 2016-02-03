@@ -21,8 +21,16 @@ function Utility.split( str, sep )
   return splitlist
 end
 
+function Utility.any( t, truefxn )
+  local numtrue = 0
+  for k, v in pairs( t ) do
+    if truefxn( k, v ) then numtrue = numtrue + 1 end
+  end
+  return numtrue > 0
+end
+
 -- The following function needs to be implemented to determine the number of
--- keys in a dictionary (see http://stackoverflow.com/a/2705804).
+-- keys in an arbitrary table (see http://stackoverflow.com/a/2705804).
 
 function Utility.len( t )
   local len = 0
