@@ -21,7 +21,9 @@ end
 
 function Shooter.update( self, dt )
   local anglepad = math.pi / 16.0
-  local newshotangle = self._shotangle + dt * self._rotdir * self._rotspeed
+  local rotdir = Utility.clamp( self._rotdir, -1.0, 1.0 )
+
+  local newshotangle = self._shotangle + dt * rotdir * self._rotspeed
   self._shotangle = Utility.clamp( newshotangle, anglepad, math.pi - anglepad )
 end
 
@@ -38,7 +40,7 @@ function Shooter.draw( self, canvas )
 end
 
 function Shooter.rotate( self, rotdir )
-  self._rotdir = Utility.clamp( self._rotdir + rotdir, -1.0, 1.0 )
+  self._rotdir = self._rotdir + rotdir
 end
 
 function Shooter.tovector( self )
