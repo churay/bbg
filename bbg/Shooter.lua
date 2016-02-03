@@ -38,7 +38,7 @@ function Shooter.draw( self, canvas )
 end
 
 function Shooter.rotate( self, rotdir )
-  self._rotdir = self._rotdir + rotdir
+  self._rotdir = Utility.clamp( self._rotdir + rotdir, -1.0, 1.0 )
 end
 
 function Shooter.tovector( self )
