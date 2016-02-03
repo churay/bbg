@@ -63,6 +63,11 @@ end
 
 function love.update( timedelta )
   board:update( timedelta )
+
+  -- TODO(JRC): Figure out a better way to handle the board reset behavior here.
+  if board:hasoverflow() then
+    board = bbg.BubbleBoard( 0, os.time() )
+  end
 end
 
 function love.draw()

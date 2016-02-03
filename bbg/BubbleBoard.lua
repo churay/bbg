@@ -38,7 +38,7 @@ function BubbleBoard.update( self, dt )
   local hasmotion = self._bubblegrid:hasmotion()
   if hadmotion and not hasmotion and ( self._numshotbubbles % 4 ) == 0 then
     local nextrowvals = {}
-    for validx = 1, self:getw(), 1 do
+    for validx = 1, self:getw() do
       table.insert( nextrowvals, self._rng:random(#Bubble.COLORS) )
     end
     self._bubblegrid:addgridrow( nextrowvals )
@@ -74,7 +74,7 @@ function BubbleBoard.draw( self, canvas )
   -- final representation for the number of shots remaining until adjustment.
   canvas.setColor( 0, 0, 0 )
   canvas.setLineWidth( 3.0e-1 )
-  for shotlineidx = 1, 4 - (self._numshotbubbles % 4), 1 do
+  for shotlineidx = 1, 4 - (self._numshotbubbles % 4) do
     local shotlinex = ( 3.0 / 4.0 ) * totalwidth + 0.5 * ( shotlineidx - 1 )
     canvas.line( shotlinex, 0.5, shotlinex, 1.5 )
   end
@@ -106,6 +106,7 @@ end
 
 function BubbleBoard.getw( self ) return self._bubblegrid:getw() end
 function BubbleBoard.geth( self ) return self._bubblegrid:geth() + 2 end
+function BubbleBoard.hasoverflow( self ) return self._bubblegrid:hasoverflow() end
 
 --[[ Private Functions ]]--
 

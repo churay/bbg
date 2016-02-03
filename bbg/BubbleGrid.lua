@@ -46,22 +46,16 @@ function BubbleGrid.draw( self, canvas )
 
   for _, bubble in ipairs( self._bubblelist ) do bubble:draw( love.graphics ) end
 
-  for gridrow, bubblerow in ipairs( self._bubblegrid ) do
-    for gridcol, bubble in ipairs( bubblerow ) do
-      if bubble ~= 0 then bubble:draw( love.graphics ) end
+  for _, cellrow, cellcol, bubble in self:_iteratecells() do
+    if bubble ~= 0 then bubble:draw( canvas ) end
 
-      -- TODO(JRC): Remove the following debugging functionality.
-      local cellpos = self:_getcellpos( gridrow, gridcol )
-      canvas.setColor( 255, 30, 0 )
-      canvas.rectangle( "line", cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
-    end
+    -- TODO(JRC): Remove the following debugging functionality.
+    local cellpos = self:_getcellpos( cellrow, cellcol )
+    canvas.setColor( 255, 30, 0 )
+    canvas.rectangle( "line", cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
   end
 
   canvas.pop()
-end
-
-function BubbleGrid.getgridbubble( self, gridrow, gridcol )
-  return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
 end
 
 function BubbleGrid.addbubble( self, bubble )
@@ -70,17 +64,20 @@ end
 
 function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
   bubble._pos = self:_getcellpos( gridrow, gridcol ) + Vector( 0.5, 0.5 )
-
   self._bubblegrid[gridrow][gridcol] = bubble
+end
+
+function BubbleGrid.getgridbubble( self, gridrow, gridcol )
+  return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
 end
 
 -- TODO(JRC): Clean up this function so that it isn't so hacky.
 function BubbleGrid.addgridrow( self, rowvals )
   self._rowoffset = self._rowoffset + 1
 
-  for gridrow = self:geth(), 2, -1 do
+  for gridrow = self:geth() + 1, 2, -1 do
     self._bubblegrid[gridrow] = self._bubblegrid[gridrow - 1]
-    for gridcol = 1, self:getw() - self:_isrowshort( gridrow ), 1 do
+    for gridcol = 1, self:getw() - self:_isrowshort( gridrow ) do
       local gridbubble = self:getgridbubble( gridrow, gridcol )
       if gridbubble ~= 0 then
         gridbubble._pos = gridbubble._pos + Vector( 0.0, -1.0 )
@@ -89,13 +86,13 @@ function BubbleGrid.addgridrow( self, rowvals )
   end
 
   local sentoffset = self:_isrowshort( 0 ) and 0.5 or -0.5
-  for gridcol = 1, self:getw() - self:_isrowshort( 0 ), 1 do
+  for gridcol = 1, self:getw() - self:_isrowshort( 0 ) do
     local sentbubble = self:getgridbubble( 0, gridcol )
     sentbubble._pos = sentbubble._pos + Vector( sentoffset, 0.0 )
   end
 
   self._bubblegrid[1] = {}
-  for gridcol = 1, self:getw() - self:_isrowshort( 1 ), 1 do
+  for gridcol = 1, self:getw() - self:_isrowshort( 1 ) do
     self:addgridbubble( Bubble(nil, nil, rowvals[gridcol]), 1, gridcol )
   end
 end
@@ -178,8 +175,11 @@ function BubbleGrid.loadfromseed( self, gridseed )
 
   self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1], #self._bubblegrid )
 
-  self._bubblegrid[0] = {}
-  for sentcol = 1, self:getw() do self:addgridbubble( Bubble(), 0, sentcol ) end
+  self._bubblegrid[0], self._bubblegrid[self:geth() + 1] = {}, {}
+  for sentcol = 1, self:getw() do
+    self:addgridbubble( Bubble(), 0, sentcol )
+    table.insert( self._bubblegrid[self:geth() + 1], 0 )
+  end
 
   for _, cellrow, cellcol, cellvalue in self:_iteratecells() do
     if cellvalue ~= 0 then
@@ -193,6 +193,13 @@ end
 function BubbleGrid.getw( self ) return self._gridbox:getw() end
 function BubbleGrid.geth( self ) return self._gridbox:geth() end
 function BubbleGrid.hasmotion( self ) return #self._bubblelist > 0 end
+function BubbleGrid.hasoverflow( self )
+  for sentcol = 1, self:getw() do
+    local sentbubble = self:getgridbubble( self:geth() + 1, sentcol )
+    if sentbubble ~= 0 and sentbubble ~= nil then return true end
+  end
+  return false
+end
 
 --[[ Private Functions ]]--
 
@@ -258,7 +265,7 @@ function BubbleGrid._iteratecells( self )
     local nextcellrow, nextcellcol = bubblegrid:_getidcell( nextcellid )
 
     local nextcell = self:getgridbubble( nextcellrow, nextcellcol )
-    if nextcell then
+    if self:_iscellvalid( nextcellrow, nextcellcol ) and nextcell then
       return nextcellid, nextcellrow, nextcellcol, nextcell
     end
   end
