@@ -69,6 +69,9 @@ function love.update( timedelta )
   board:update( timedelta )
 
   -- TODO(JRC): Figure out a better way to handle the board reset behavior here.
+  -- NOTE(JRC): This could be better handled by implementing an improved version
+  -- of the "BubbleBoard.save" function that saves its queue information in
+  -- addition to the board.
   if board:hasoverflow() then board = bbg.BubbleBoard( 0, os.time() ) end
 end
 

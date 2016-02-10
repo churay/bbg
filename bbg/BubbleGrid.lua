@@ -162,7 +162,6 @@ end
 
 function BubbleGrid.loadfromseed( self, gridseed )
   self._bubblelist, self._bubblegrid = {}, {}
-  self._rowoffset = 0
 
   local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
@@ -186,7 +185,8 @@ function BubbleGrid.loadfromseed( self, gridseed )
     end
   end
 
-  self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1], #self._bubblegrid )
+  self._rowoffset = #self._bubblegrid[1] < #self._bubblegrid[2] and 1 or 0
+  self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1 + self._rowoffset], #self._bubblegrid )
 
   self._bubblegrid[0], self._bubblegrid[self:geth() + 1] = {}, {}
   for sentcol = 1, self:getw() do
