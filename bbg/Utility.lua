@@ -21,6 +21,14 @@ function Utility.split( str, sep )
   return splitlist
 end
 
+function Utility.keyof( v, t )
+  local k = nil
+  for tk, tv in pairs( t ) do
+    if tv == v then k = tk end
+  end
+  return k
+end
+
 function Utility.any( t, truefxn )
   local numtrue = 0
   for k, v in pairs( t ) do

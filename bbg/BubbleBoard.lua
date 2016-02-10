@@ -97,6 +97,16 @@ function BubbleBoard.rotateshooter( self, rotdir )
   self._shooter:rotate( rotdir )
 end
 
+function BubbleBoard.save( self, gridseed )
+  self._bubblegrid:savetoseed( gridseed )
+end
+
+function BubbleBoard.load( self, gridseed )
+  if not self._bubblegrid:hasmotion() then
+    self._bubblegrid:loadfromseed( gridseed )
+  end
+end
+
 --[[ Accessor Functions ]]--
 
 function BubbleBoard.getw( self ) return self._bubblegrid:getw() end

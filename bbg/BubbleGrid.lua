@@ -143,7 +143,21 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
 end
 
 function BubbleGrid.savetoseed( self, gridseed )
-  -- TODO(JRC): Implement this function.
+  local seedfilename = self:_getseedfilename( gridseed )
+  local seedfile = love.filesystem.newFile( seedfilename )
+
+  if seedfile:open( "w" ) then
+    for cellid, cellrow, cellcol, cellbubble in self:_iteratecells() do
+      local cellvalue = cellbubble ~= 0 and
+        Utility.keyof( cellbubble:getcolor(), Bubble.COLORS ) or 0
+
+      if cellid ~= 0 and cellcol == 1 then seedfile:write( "\n" ) end
+      seedfile:write( tostring(cellvalue) .. " " )
+    end
+  end
+
+  -- TODO(JRC): Remove this once debugging is completed!
+  print( "Saved grid to seed file " .. seedfilename )
 end
 
 function BubbleGrid.loadfromseed( self, gridseed )
@@ -185,6 +199,9 @@ function BubbleGrid.loadfromseed( self, gridseed )
       self:addgridbubble( Bubble(nil, nil, cellvalue), cellrow, cellcol )
     end
   end
+
+  -- TODO(JRC): Remove this once debugging is completed!
+  print( "Loaded grid from seed file " .. seedfilename )
 end
 
 --[[ Accessor Functions ]]--

@@ -44,17 +44,24 @@ end
 
 function love.load()
   board = bbg.BubbleBoard( 0, os.time() )
+  isloading = false
 end
 
 function love.keypressed( key, scancode, isrepeat )
   if key == "q" then love.event.quit() end
+  if string.match( key, ".alt" ) then isloading = true end
 
   if key == "space" then board:shootbubble() end
   if key == "left" or key == "h" then board:rotateshooter( 1.0 ) end
   if key == "right" or key == "l" then board:rotateshooter( -1.0 ) end
+
+  if string.match( key, "[0-9]" ) then
+    if isloading then board:load( key ) else board:save( key ) end
+  end
 end
 
 function love.keyreleased( key, scancode )
+  if string.match( key, ".alt" ) then isloading = false end
   if key == "left" or key == "h" then board:rotateshooter( -1.0 ) end
   if key == "right" or key == "l" then board:rotateshooter( 1.0 ) end
 end
