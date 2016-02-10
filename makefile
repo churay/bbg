@@ -8,16 +8,30 @@ LUA_TESTER_FLAGS = --lpath='$(LUA_DIR)/?.lua;$(PROJ_DIR)/?/init.lua;$(TEST_DIR)/
 ### Project Files and Directories ###
 
 PROJ_DIR = .
+BIN_DIR = $(PROJ_DIR)/bin
 LUA_DIR = $(PROJ_DIR)/bbg
 TEST_DIR = $(PROJ_DIR)/spec
 
+BBG_DIST = $(BIN_DIR)/bbg
+BBG_EXE = $(BIN_DIR)/bbg/bbg.exe
+BBG_LOVE = $(BIN_DIR)/bbg.love
+
 ### Build Rules ###
 
-.PHONY : bbg tests %Test
+.PHONY : dist love main tests %Test clean
 
-all : bbg
+all : main
 
-bbg :
+$(BBG_DIST) dist : $(BBG_LOVE)
+	wget -O $(BIN_DIR)/love.zip https://bitbucket.org/rude/love/downloads/love-0.10.0-win32.zip
+	unzip -d $(BIN_DIR) $(BIN_DIR)/love.zip
+	mv $(BIN_DIR)/love-0.10.0-win32 $(BBG_DIST)
+	cat $(BBG_DIST)/love.exe $(BBG_LOVE) > $(BBG_EXE)
+
+$(BBG_LOVE) love : $(wildcard $(PROJ_DIR)/*.lua) $(wildcard $(LUA_DIR)/*.lua)
+	zip -9 -q -r $(BBG_LOVE) $(PROJ_DIR)
+
+main :
 	$(LUA_PROJ_RUNNER) $(LUA_PROJ_RUNNER_FLAGS) $(PROJ_DIR)
 
 tests : $(wildcard $(LUA_DIR)/*.lua) $(wildcard $(TEST_DIR)/*.lua)
@@ -25,3 +39,6 @@ tests : $(wildcard $(LUA_DIR)/*.lua) $(wildcard $(TEST_DIR)/*.lua)
 
 %Test : $(TEST_DIR)/%Spec.lua
 	$(LUA_TESTER) $(LUA_TESTER_FLAGS) --pattern='$(basename $(<F))' $(TEST_DIR)
+
+clean :
+	rm -rf $(BIN_DIR)/*
