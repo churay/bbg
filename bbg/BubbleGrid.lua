@@ -3,9 +3,13 @@ local Class = require( "Class" )
 local Vector = require( "Vector" )
 local Box = require( "Box" )
 local Utility = require( "Utility" )
+local Color = require( "Color" )
 
 local Bubble = require( "Bubble" )
 local BubbleGrid = Class()
+
+BubbleGrid.BGCOLOR = Color.byname( "lgray" )
+BubbleGrid.DEBUGCOLOR = { 1.0, 0.2, 0.0 } -- orange
 
 --[[ Constructors ]]--
 
@@ -41,7 +45,7 @@ end
 function BubbleGrid.draw( self, canvas )
   canvas.push()
 
-  canvas.setColor( 200, 200, 200 )
+  canvas.setColor( unpack(BubbleGrid.BGCOLOR) )
   canvas.rectangle( "fill", 0.0, 0.0, self:getw(), self:geth() )
 
   for _, bubble in ipairs( self._bubblelist ) do bubble:draw( love.graphics ) end
@@ -51,7 +55,7 @@ function BubbleGrid.draw( self, canvas )
 
     -- TODO(JRC): Remove the following debugging functionality.
     local cellpos = self:_getcellpos( cellrow, cellcol )
-    canvas.setColor( 255, 30, 0 )
+    canvas.setColor( unpack(BubbleGrid.DEBUGCOLOR) )
     canvas.rectangle( "line", cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
   end
 

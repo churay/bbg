@@ -32,7 +32,7 @@ function love.run()
 
     if love.getinput then love.getinput() end
     if love.update then love.update( timedelta ) end
-    if love.window and love.graphics and love.window.isCreated() then
+    if love.window and love.graphics and love.window.isOpen() then
       love.graphics.clear( 0, 0, 0 )
       love.draw()
       love.graphics.present()

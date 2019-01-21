@@ -1,6 +1,7 @@
 local Class = require( "Class" )
 
 local Vector = require( "Vector" )
+local Color = require( "Color" )
 local Box = require( "Box" )
 local Bubble = require( "Bubble" )
 
@@ -8,6 +9,9 @@ local Shooter = require( "Shooter" )
 local BubbleQueue = require( "BubbleQueue" )
 local BubbleGrid = require( "BubbleGrid" )
 local BubbleBoard = Class()
+
+BubbleBoard.BGCOLOR = Color.byname( "white" )
+BubbleBoard.UICOLOR = Color.byname( "black" )
 
 --[[ Constructors ]]--
 
@@ -48,7 +52,7 @@ function BubbleBoard.draw( self, canvas )
   local totalheight = gridheight + queueheight
 
   canvas.push()
-  canvas.setColor( 255, 255, 255 )
+  canvas.setColor( unpack(BubbleBoard.BGCOLOR) )
   canvas.rectangle( "fill", 0.0, 0.0, 1.0, 1.0 )
 
   canvas.push()
@@ -67,7 +71,7 @@ function BubbleBoard.draw( self, canvas )
 
   -- TODO(JRC): Move this logic to its own class if this ends up being the
   -- final representation for the number of shots remaining until adjustment.
-  canvas.setColor( 0, 0, 0 )
+  canvas.setColor( unpack(BubbleBoard.UICOLOR) )
   canvas.setLineWidth( 3.0e-1 )
   for shotlineidx = 1, 4 - ( self._numshots % 4 ) do
     local shotlinex = ( 3.0 / 4.0 ) * totalwidth + 0.5 * ( shotlineidx - 1 )

@@ -4,6 +4,8 @@ local Bubble = require( "Bubble" )
 local Utility = require( "Utility" )
 local Shooter = Class()
 
+Shooter.LINECOLOR = { 0.8, 0.6, 0.2 } -- brown
+
 --[[ Constructors ]]--
 
 function Shooter._init( self, pos, length, shotspeed, rotspeed )
@@ -34,7 +36,7 @@ function Shooter.draw( self, canvas )
   canvas.translate( self._pos:getxy() )
 
   canvas.setLineWidth( 1.0e-1 )
-  canvas.setColor( 212, 154, 44 )
+  canvas.setColor( unpack(Shooter.LINECOLOR) )
   canvas.line( -gvector:getx(), -gvector:gety(), gvector:getx(), gvector:gety() )
   canvas.pop()
 end
