@@ -1,8 +1,8 @@
-local Class = require( "Class" )
+local Class = require( 'Class' )
 
-local Queue = require( "Queue" )
-local Vector = require( "Vector" )
-local Bubble = require( "Bubble" )
+local Queue = require( 'Queue' )
+local Vector = require( 'Vector' )
+local Bubble = require( 'Bubble' )
 
 local BubbleQueue = Class()
 

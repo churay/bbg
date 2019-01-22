@@ -1,7 +1,7 @@
-local Class = require( "Class" )
-local Vector = require( "Vector" )
-local Bubble = require( "Bubble" )
-local Utility = require( "Utility" )
+local Class = require( 'Class' )
+local Vector = require( 'Vector' )
+local Bubble = require( 'Bubble' )
+local Utility = require( 'Utility' )
 local Shooter = Class()
 
 Shooter.LINECOLOR = { 0.8, 0.6, 0.2 } -- brown

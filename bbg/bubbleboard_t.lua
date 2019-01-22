@@ -1,17 +1,17 @@
-local Class = require( "Class" )
+local Class = require( 'Class' )
 
-local Vector = require( "Vector" )
-local Color = require( "Color" )
-local Box = require( "Box" )
-local Bubble = require( "Bubble" )
+local Vector = require( 'Vector' )
+local Color = require( 'Color' )
+local Box = require( 'Box' )
+local Bubble = require( 'Bubble' )
 
-local Shooter = require( "Shooter" )
-local BubbleQueue = require( "BubbleQueue" )
-local BubbleGrid = require( "BubbleGrid" )
+local Shooter = require( 'Shooter' )
+local BubbleQueue = require( 'BubbleQueue' )
+local BubbleGrid = require( 'BubbleGrid' )
 local BubbleBoard = Class()
 
-BubbleBoard.BGCOLOR = Color.byname( "white" )
-BubbleBoard.UICOLOR = Color.byname( "black" )
+BubbleBoard.BGCOLOR = Color.byname( 'white' )
+BubbleBoard.UICOLOR = Color.byname( 'black' )
 
 --[[ Constructors ]]--
 
@@ -53,7 +53,7 @@ function BubbleBoard.draw( self, canvas )
 
   canvas.push()
   canvas.setColor( unpack(BubbleBoard.BGCOLOR) )
-  canvas.rectangle( "fill", 0.0, 0.0, 1.0, 1.0 )
+  canvas.rectangle( 'fill', 0.0, 0.0, 1.0, 1.0 )
 
   canvas.push()
   canvas.translate( 0, queueheight / totalheight )

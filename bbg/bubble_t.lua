@@ -1,10 +1,10 @@
-local Class = require( "Class" )
-local Vector = require( "Vector" )
-local Box = require( "Box" )
-local Color = require( "Color" )
+local Class = require( 'Class' )
+local Vector = require( 'Vector' )
+local Box = require( 'Box' )
+local Color = require( 'Color' )
 local Bubble = Class()
 
-Bubble.COLORS = { Color.byname("red"), Color.byname("green"), Color.byname("blue"), Color.byname("yellow") }
+Bubble.COLORS = { Color.byname('red'), Color.byname('green'), Color.byname('blue'), Color.byname('yellow') }
 
 --[[ Constructors ]]--
 
@@ -29,11 +29,11 @@ function Bubble.draw( self, canvas )
   canvas.translate( self._pos:getxy() )
 
   canvas.setColor( unpack(self._color) )
-  canvas.circle( "fill", 0.0, 0.0, 0.5, 20.0 )
+  canvas.circle( 'fill', 0.0, 0.0, 0.5, 20.0 )
 
   -- TODO(JRC): Remove this functionality after debugging is complete.
   canvas.setColor( Color.from255(234, 255, 0) )
-  canvas.rectangle( "line", -0.5, -0.5, 1.0, 1.0 )
+  canvas.rectangle( 'line', -0.5, -0.5, 1.0, 1.0 )
   canvas.pop()
 end
 

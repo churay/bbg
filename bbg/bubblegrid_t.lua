@@ -1,14 +1,14 @@
-local Class = require( "Class" )
+local Class = require( 'Class' )
 
-local Vector = require( "Vector" )
-local Box = require( "Box" )
-local Utility = require( "Utility" )
-local Color = require( "Color" )
+local Vector = require( 'Vector' )
+local Box = require( 'Box' )
+local Utility = require( 'Utility' )
+local Color = require( 'Color' )
 
-local Bubble = require( "Bubble" )
+local Bubble = require( 'Bubble' )
 local BubbleGrid = Class()
 
-BubbleGrid.BGCOLOR = Color.byname( "lgray" )
+BubbleGrid.BGCOLOR = Color.byname( 'lgray' )
 BubbleGrid.DEBUGCOLOR = { 1.0, 0.2, 0.0 } -- orange
 
 --[[ Constructors ]]--
@@ -46,7 +46,7 @@ function BubbleGrid.draw( self, canvas )
   canvas.push()
 
   canvas.setColor( unpack(BubbleGrid.BGCOLOR) )
-  canvas.rectangle( "fill", 0.0, 0.0, self:getw(), self:geth() )
+  canvas.rectangle( 'fill', 0.0, 0.0, self:getw(), self:geth() )
 
   for _, bubble in ipairs( self._bubblelist ) do bubble:draw( love.graphics ) end
 
@@ -56,7 +56,7 @@ function BubbleGrid.draw( self, canvas )
     -- TODO(JRC): Remove the following debugging functionality.
     local cellpos = self:_getcellpos( cellrow, cellcol )
     canvas.setColor( unpack(BubbleGrid.DEBUGCOLOR) )
-    canvas.rectangle( "line", cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
+    canvas.rectangle( 'line', cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
   end
 
   canvas.pop()
@@ -150,18 +150,18 @@ function BubbleGrid.savetoseed( self, gridseed )
   local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
 
-  if seedfile:open( "w" ) then
+  if seedfile:open( 'w' ) then
     for cellid, cellrow, cellcol, cellbubble in self:_iteratecells() do
       local cellvalue = cellbubble ~= 0 and
         Utility.keyof( cellbubble:getcolor(), Bubble.COLORS ) or 0
 
-      if cellid ~= 0 and cellcol == 1 then seedfile:write( "\n" ) end
-      seedfile:write( tostring(cellvalue) .. " " )
+      if cellid ~= 0 and cellcol == 1 then seedfile:write( '\n' ) end
+      seedfile:write( tostring(cellvalue) .. ' ' )
     end
   end
 
   -- TODO(JRC): Remove this once debugging is completed!
-  print( "Saved grid to seed file " .. seedfilename )
+  print( 'Saved grid to seed file ' .. seedfilename )
 end
 
 function BubbleGrid.loadfromseed( self, gridseed )
@@ -170,10 +170,10 @@ function BubbleGrid.loadfromseed( self, gridseed )
   local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
 
-  if seedfile:open( "r" ) then
+  if seedfile:open( 'r' ) then
     for gridline in seedfile:lines() do
       local linebubbles = {}
-      for _, linebubble in ipairs( Utility.split(gridline, " ") ) do
+      for _, linebubble in ipairs( Utility.split(gridline, ' ') ) do
         table.insert( linebubbles, tonumber(linebubble) )
       end
       table.insert( self._bubblegrid, linebubbles )
@@ -205,7 +205,7 @@ function BubbleGrid.loadfromseed( self, gridseed )
   end
 
   -- TODO(JRC): Remove this once debugging is completed!
-  print( "Loaded grid from seed file " .. seedfilename )
+  print( 'Loaded grid from seed file ' .. seedfilename )
 end
 
 --[[ Accessor Functions ]]--
@@ -358,7 +358,7 @@ function BubbleGrid._isrowshort( self, gridrow )
 end
 
 function BubbleGrid._getseedfilename( self, gridseed )
-  return "boards/" .. gridseed .. ".txt"
+  return 'boards/' .. gridseed .. '.txt'
 end
 
 return BubbleGrid

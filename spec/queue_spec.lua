@@ -1,7 +1,7 @@
-require( "bustedext" )
-local queue_t = require( "bbg.queue_t" )
+require( 'bustedext' )
+local queue_t = require( 'bbg.queue_t' )
 
-describe( "queue_t", function()
+describe( 'queue_t', function()
   --[[ Testing Constants ]]--
 
   local TEST_QUEUE_VALUES = { 1, 2, 3 }
@@ -26,11 +26,11 @@ describe( "queue_t", function()
 
   --[[ Testing Functions ]]--
 
-  it( "inserts values at the front of its list on enqueue", function()
+  it( 'inserts values at the front of its list on enqueue', function()
     assert.are.equallists( TEST_QUEUE_VALUES, testqueue:tolist() )
   end )
 
-  it( "removes values from the front of its list on dequeue", function()
+  it( 'removes values from the front of its list on dequeue', function()
     for frontvalidx = 1, #TEST_QUEUE_VALUES do
       assert.are.equal( TEST_QUEUE_VALUES[frontvalidx], testqueue:dequeue() )
       assert.are.equallists(
@@ -40,7 +40,7 @@ describe( "queue_t", function()
     end
   end )
 
-  it( "supports arbitrary sequences of enqueue/dequeue operations", function()
+  it( 'supports arbitrary sequences of enqueue/dequeue operations', function()
     for i = 1, 2 do testqueue:dequeue() end
     for i = TEST_QUEUE_VALUES[3] + 1, TEST_QUEUE_VALUES[3] + 5 do testqueue:enqueue( i ) end
     for i = 1, 4 do testqueue:dequeue() end
@@ -49,7 +49,7 @@ describe( "queue_t", function()
     assert.are.equallists( expectedsequence, testqueue:tolist() )
   end )
 
-  it( "allows its first value to be viewed and not removed with peek", function()
+  it( 'allows its first value to be viewed and not removed with peek', function()
     for frontvalidx = 1, #TEST_QUEUE_VALUES - 1 do
       assert.are.equal( TEST_QUEUE_VALUES[frontvalidx], testqueue:peek() )
       assert.are.equallists(
@@ -60,19 +60,19 @@ describe( "queue_t", function()
     end
   end )
 
-  it( "returns the correct value when queried for its length", function()
+  it( 'returns the correct value when queried for its length', function()
     for numdequeues = 0, #TEST_QUEUE_VALUES do
       assert.are.equal( #TEST_QUEUE_VALUES - numdequeues, testqueue:length() )
       testqueue:dequeue()
     end
   end )
 
-  it( "can be purged through the use of the clear operation", function()
+  it( 'can be purged through the use of the clear operation', function()
     testqueue:clear()
     assert.are.equallists( {}, testqueue:tolist() )
   end )
 
-  it( "properly indicates that queues with different values are unequal", function()
+  it( 'properly indicates that queues with different values are unequal', function()
     local blankqueue = queue_t()
     assert.are_not.equal( testqueue, blankqueue )
 
@@ -83,7 +83,7 @@ describe( "queue_t", function()
     assert.are_not.equal( testqueue, invertedqueue )
   end )
 
-  it( "indicates that queues with the same values and orderings are equal", function()
+  it( 'indicates that queues with the same values and orderings are equal', function()
     assert.are.equal( testqueue, testqueue )
 
     local copyqueue = queue_t()

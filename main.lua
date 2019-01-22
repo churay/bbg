@@ -63,8 +63,8 @@ function love.keyreleased( key, scancode )
 end
 
 function love.update( dt )
-  fxn.global.fnum = fxn.global.fnum + 1
-  fxn.global.avgfps = 1 / dt
+  bbg.global.fnum = bbg.global.fnum + 1
+  bbg.global.avgfps = 1 / dt
 
   board:update( dt )
   -- TODO(JRC): Figure out a better way to handle the board reset behavior here.
