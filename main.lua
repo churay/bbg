@@ -1,9 +1,8 @@
--- TODO(JRC): Eliminate this path inclusion somehow.
-package.path = package.path .. ";bbg/?.lua"
-local bbg = require( "bbg" )
+local bbg = require( 'bbg' )
+love.ext = require( 'opt.loveext' )
 
--- package.path = package.path .. ";debug/?.lua"
--- ldb = require( "debug.debugger" )
+-- package.path = package.path .. ';debug/?.lua'
+-- ldb = require( 'debug.debugger' )
 
 function love.run()
   math.randomseed( os.time() )
@@ -11,68 +10,68 @@ function love.run()
   if love.load then love.load( arg ) end
   if love.timer then love.timer.step() end
 
-  local timedelta = 0
   local isrunning = true
+  local framestart, frameend, frameleft = 0, 0, 0
   while isrunning do
     if love.event then
       love.event.pump()
       for levent, a, b, c, d in love.event.poll() do
-        if levent == "quit" then
-          isrunning = false
-        end
-
+        if levent == 'quit' then isrunning = false end
         love.handlers[levent]( a, b, c, d )
       end
     end
 
-    if love.timer then
-      love.timer.step()
-      timedelta = love.timer.getDelta()
-    end
-
+    framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
-    if love.update then love.update( timedelta ) end
-    if love.window and love.graphics and love.window.isOpen() then
-      love.graphics.clear( 0, 0, 0 )
+    if love.update then love.update( bbg.global.fdt + math.max(-frameleft, 0) ) end
+    if love.window and love.graphics and love.window.isCreated() then
+      love.graphics.clear( bbg.colors.byname('black') )
       love.draw()
       love.graphics.present()
     end
+    frameend = love.timer and love.timer.getTime() or 0
 
-    if love.timer then love.timer.sleep( 1.0e-3 ) end
+    if love.timer then
+      frameleft = bbg.global.fdt - ( frameend - framestart )
+      if frameleft > 0 then love.timer.sleep( frameleft ) end
+      love.timer.step()
+    end
   end
 end
 
 function love.load()
-  board = bbg.BubbleBoard( 0, os.time() )
+  board = bbg.bubbleboard_t( 0, os.time() )
 end
 
 function love.keypressed( key, scancode, isrepeat )
-  if key == "q" then love.event.quit() end
-  if string.match( key, ".alt" ) then isloading = true end
+  if key == 'q' then love.event.quit() end
+  if string.match( key, '.alt' ) then isloading = true end
 
-  if key == "space" then board:shootbubble() end
-  if key == "left" or key == "h" then board:rotateshooter( 1.0 ) end
-  if key == "right" or key == "l" then board:rotateshooter( -1.0 ) end
+  if key == 'space' then board:shootbubble() end
+  if key == 'left' or key == 'h' then board:rotateshooter( 1.0 ) end
+  if key == 'right' or key == 'l' then board:rotateshooter( -1.0 ) end
 
-  if string.match( key, "[0-9]" ) then
-    if love.keyboard.isDown( "lalt", "ralt" ) then board:load( key )
+  if string.match( key, '[0-9]' ) then
+    if love.keyboard.isDown( 'lalt', 'ralt' ) then board:load( key )
     else board:save( key ) end
   end
 end
 
 function love.keyreleased( key, scancode )
-  if key == "left" or key == "h" then board:rotateshooter( -1.0 ) end
-  if key == "right" or key == "l" then board:rotateshooter( 1.0 ) end
+  if key == 'left' or key == 'h' then board:rotateshooter( -1.0 ) end
+  if key == 'right' or key == 'l' then board:rotateshooter( 1.0 ) end
 end
 
-function love.update( timedelta )
-  board:update( timedelta )
+function love.update( dt )
+  fxn.global.fnum = fxn.global.fnum + 1
+  fxn.global.avgfps = 1 / dt
 
+  board:update( dt )
   -- TODO(JRC): Figure out a better way to handle the board reset behavior here.
   -- NOTE(JRC): This could be better handled by implementing an improved version
-  -- of the "BubbleBoard.save" function that saves its queue information in
+  -- of the 'BubbleBoard.save' function that saves its queue information in
   -- addition to the board.
-  if board:hasoverflow() then board = bbg.BubbleBoard( 0, os.time() ) end
+  if board:hasoverflow() then board = bbg.bubbleboard_t( 0, os.time() ) end
 end
 
 function love.draw()

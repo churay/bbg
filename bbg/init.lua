@@ -1,18 +1,35 @@
--- TODO(JRC): Improve the initialization script to automatically pull all of the
--- class files from the "bbg" directory.
+local util = require( 'util' )
+local bbg = util.libload( 'bbg' )
 
-bbg = {
-  Class = require( "Class" ),
+-- NOTE(JRC): If any of the reserved variable tables are overloaded with
+-- a module name, then this module should fail to load.
+if bbg.global ~= nil or bbg.model ~= nil or bbg.view ~= nil or bbg.input ~= nil then
+  return nil
+end
 
-  Vector = require( "Vector" ),
-  Box = require( "Box" ),
-  Queue = require( "Queue" ),
-  Graph = require( "Graph" ),
+--[[ Global Values ]]--
 
-  Bubble = require( "Bubble" ),
-  Shooter = require( "Shooter" ),
-  BubbleGrid = require( "BubbleGrid" ),
-  BubbleBoard = require( "BubbleBoard" ),
-}
+bbg.global = {}
+bbg.global.debug = true
+bbg.global.fnum = 1
+bbg.global.fps = 60.0
+bbg.global.avgfps = 0.0
+bbg.global.fdt = 1 / bbg.global.fps
+
+--[[ Model Values ]]--
+
+bbg.model = {}
+bbg.model.board = 0
+bbg.model.func = 0
+
+--[[ View Values ]]--
+
+bbg.view = {}
+bbg.view.viewport = 0
+
+--[[ Input Values ]]--
+
+bbg.input = {}
+bbg.input.mouse = 0
 
 return bbg
