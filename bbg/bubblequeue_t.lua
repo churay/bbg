@@ -40,13 +40,12 @@ function bubblequeue_t.draw( self, canvas )
 end
 
 function bubblequeue_t.enqueue( self )
-  -- TODO(JRC): Change this to an apply function for the sake of efficiency.
   for _, bubble in ipairs( self._queue:tolist() ) do
-    bubble._pos = bubble._pos + vector_t( 1.0, 0.0 )
+    bubble._pos:addip( vector_t(1.0, 0.0) )
   end
 
   local newpos = vector_t( 0.5, 0.5 )
-  local newbubble = bubble_t( newpos, self._rng:random(bubble_t.getnumcolors()) )
+  local newbubble = bubble_t( bubble_t.getnextcolorid(self._rng), newpos )
   self._queue:enqueue( newbubble )
 end
 

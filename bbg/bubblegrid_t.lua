@@ -1,25 +1,30 @@
-local Class = require( 'Class' )
+local struct = require( 'bbg.struct' )
+local util = require( 'util' )
+local color = require( 'bbg.color' )
 
-local Vector = require( 'Vector' )
-local Box = require( 'Box' )
-local Utility = require( 'Utility' )
-local Color = require( 'Color' )
+local vector_t = require( 'bbg.vector_t' )
+local bbox_t = require( 'bbg.bbox_t' )
+local bubble_t = require( 'bbg.bubble_t' )
 
-local Bubble = require( 'Bubble' )
-local BubbleGrid = Class()
-
-BubbleGrid.BGCOLOR = Color.byname( 'lgray' )
-BubbleGrid.DEBUGCOLOR = { 1.0, 0.2, 0.0 } -- orange
+local BGCOLOR = color.byname( 'lgray' )
+local DEBUGCOLOR = { 1.0, 0.2, 0.0 } -- orange
 
 --[[ Constructors ]]--
 
-function BubbleGrid._init( self, gridseed )
+local bubblegrid_t = struct( {},
+  '_bubblelist', {},
+  '_bubblegrid', {},
+  '_rowoffset', 0,
+  '_gridbox', bbox_t(),
+)
+
+function bubblegrid_t._init( self, gridseed )
   self:loadfromseed( gridseed )
 end
 
 --[[ Public Functions ]]--
 
-function BubbleGrid.update( self, dt )
+function bubblegrid_t.update( self, dt )
   for bubbleidx = #self._bubblelist, 1, -1 do
     local bubble = self._bubblelist[bubbleidx]
 
@@ -42,10 +47,10 @@ function BubbleGrid.update( self, dt )
   end
 end
 
-function BubbleGrid.draw( self, canvas )
+function bubblegrid_t.draw( self, canvas )
   canvas.push()
 
-  canvas.setColor( unpack(BubbleGrid.BGCOLOR) )
+  canvas.setColor( util.unpack(BGCOLOR) )
   canvas.rectangle( 'fill', 0.0, 0.0, self:getw(), self:geth() )
 
   for _, bubble in ipairs( self._bubblelist ) do bubble:draw( love.graphics ) end
@@ -55,27 +60,27 @@ function BubbleGrid.draw( self, canvas )
 
     -- TODO(JRC): Remove the following debugging functionality.
     local cellpos = self:_getcellpos( cellrow, cellcol )
-    canvas.setColor( unpack(BubbleGrid.DEBUGCOLOR) )
+    canvas.setColor( util.unpack(DEBUGCOLOR) )
     canvas.rectangle( 'line', cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
   end
 
   canvas.pop()
 end
 
-function BubbleGrid.addbubble( self, bubble )
+function bubblegrid_t.addbubble( self, bubble )
   table.insert( self._bubblelist, bubble )
 end
 
-function BubbleGrid.addgridbubble( self, bubble, gridrow, gridcol )
-  bubble._pos = self:_getcellpos( gridrow, gridcol ) + Vector( 0.5, 0.5 )
+function bubblegrid_t.addgridbubble( self, bubble, gridrow, gridcol )
+  bubble._pos = self:_getcellpos( gridrow, gridcol ) + vector_t( 0.5, 0.5 )
   self._bubblegrid[gridrow][gridcol] = bubble
 end
 
-function BubbleGrid.getgridbubble( self, gridrow, gridcol )
+function bubblegrid_t.getgridbubble( self, gridrow, gridcol )
   return self._bubblegrid[gridrow] and self._bubblegrid[gridrow][gridcol]
 end
 
-function BubbleGrid.addgridrow( self, rowbubbles )
+function bubblegrid_t.addgridrow( self, rowbubbles )
   self._rowoffset = self._rowoffset + 1
 
   for gridrow = self:geth() + 1, 2, -1 do
@@ -83,7 +88,7 @@ function BubbleGrid.addgridrow( self, rowbubbles )
     for gridcol = 1, self:getw() - self:_isrowshort( gridrow ) do
       local gridbubble = self:getgridbubble( gridrow, gridcol )
       if gridbubble ~= 0 then
-        gridbubble._pos = gridbubble._pos + Vector( 0.0, -1.0 )
+        gridbubble._pos = gridbubble._pos + vector_t( 0.0, -1.0 )
       end
     end
   end
@@ -91,7 +96,7 @@ function BubbleGrid.addgridrow( self, rowbubbles )
   local sentoffset = self:_isrowshort( 0 ) and 0.5 or -0.5
   for gridcol = 1, self:getw() - self:_isrowshort( 0 ) do
     local sentbubble = self:getgridbubble( 0, gridcol )
-    sentbubble._pos = sentbubble._pos + Vector( sentoffset, 0.0 )
+    sentbubble._pos = sentbubble._pos + vector_t( sentoffset, 0.0 )
   end
 
   self._bubblegrid[1] = {}
@@ -100,7 +105,7 @@ function BubbleGrid.addgridrow( self, rowbubbles )
   end
 end
 
-function BubbleGrid.popgridbubble( self, gridrow, gridcol )
+function bubblegrid_t.popgridbubble( self, gridrow, gridcol )
   local popbubble = self._bubblegrid[gridrow][gridcol]
 
   local function popnextfxn( r, c )
@@ -120,7 +125,7 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
   local bubblestopop = self:_querycells( { self:_getcellid(gridrow, gridcol) },
     popnextfxn, popqueryfxn )
 
-  if Utility.len( bubblestopop ) >= 3 then
+  if util.len( bubblestopop ) >= 3 then
     for bubbleid, _ in pairs( bubblestopop ) do
       local bubblerow, bubblecol = self:_getidcell( bubbleid )
       self._bubblegrid[bubblerow][bubblecol] = 0
@@ -146,15 +151,13 @@ function BubbleGrid.popgridbubble( self, gridrow, gridcol )
   end
 end
 
-function BubbleGrid.savetoseed( self, gridseed )
+function bubblegrid_t.savetoseed( self, gridseed )
   local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
 
   if seedfile:open( 'w' ) then
     for cellid, cellrow, cellcol, cellbubble in self:_iteratecells() do
-      local cellvalue = cellbubble ~= 0 and
-        Utility.keyof( cellbubble:getcolor(), Bubble.COLORS ) or 0
-
+      local cellvalue = cellbubble ~= 0 and cellbubble:getcolorid() or 0
       if cellid ~= 0 and cellcol == 1 then seedfile:write( '\n' ) end
       seedfile:write( tostring(cellvalue) .. ' ' )
     end
@@ -164,16 +167,14 @@ function BubbleGrid.savetoseed( self, gridseed )
   print( 'Saved grid to seed file ' .. seedfilename )
 end
 
-function BubbleGrid.loadfromseed( self, gridseed )
-  self._bubblelist, self._bubblegrid = {}, {}
-
+function bubblegrid_t.loadfromseed( self, gridseed )
   local seedfilename = self:_getseedfilename( gridseed )
   local seedfile = love.filesystem.newFile( seedfilename )
 
   if seedfile:open( 'r' ) then
     for gridline in seedfile:lines() do
       local linebubbles = {}
-      for _, linebubble in ipairs( Utility.split(gridline, ' ') ) do
+      for _, linebubble in ipairs( util.split(gridline, ' ') ) do
         table.insert( linebubbles, tonumber(linebubble) )
       end
       table.insert( self._bubblegrid, linebubbles )
@@ -183,24 +184,25 @@ function BubbleGrid.loadfromseed( self, gridseed )
     for gridrow = 1, 11 do
       local bubblerow = {}
       for gridcol = 1, 8 - 1 * ( (gridrow + 1) % 2 ) do
-        table.insert( bubblerow, gridrow <= 4 and math.random(#Bubble.COLORS) or 0 )
+        table.insert( bubblerow, gridrow <= 4 and bubble_t.getnextcolorid() or 0 )
       end
       table.insert( self._bubblegrid, bubblerow )
     end
   end
 
   self._rowoffset = #self._bubblegrid[1] < #self._bubblegrid[2] and 1 or 0
-  self._gridbox = Box( 0.0, 0.0, #self._bubblegrid[1 + self._rowoffset], #self._bubblegrid )
+  self._gridbox.max.x = #self._bubblegrid[1 + self._rowoffset]
+  self._gridbox.max.y = #self._bubblegrid
 
   self._bubblegrid[0], self._bubblegrid[self:geth() + 1] = {}, {}
   for sentcol = 1, self:getw() do
-    self:addgridbubble( Bubble(), 0, sentcol )
+    self:addgridbubble( bubble_t(), 0, sentcol )
     table.insert( self._bubblegrid[self:geth() + 1], 0 )
   end
 
   for _, cellrow, cellcol, cellvalue in self:_iteratecells() do
     if cellvalue ~= 0 then
-      self:addgridbubble( Bubble(nil, nil, cellvalue), cellrow, cellcol )
+      self:addgridbubble( bubble_t(cellvalue), cellrow, cellcol )
     end
   end
 
@@ -210,16 +212,16 @@ end
 
 --[[ Accessor Functions ]]--
 
-function BubbleGrid.getw( self ) return self._gridbox:getw() end
-function BubbleGrid.geth( self ) return self._gridbox:geth() end
-function BubbleGrid.hasmotion( self ) return #self._bubblelist > 0 end
-function BubbleGrid.hasoverflow( self )
-  return Utility.any( self._bubblegrid[self:geth() + 1], function(k, v) return v ~= 0 end )
+function bubblegrid_t.getw( self ) return self._gridbox:getw() end
+function bubblegrid_t.geth( self ) return self._gridbox:geth() end
+function bubblegrid_t.hasmotion( self ) return #self._bubblelist > 0 end
+function bubblegrid_t.hasoverflow( self )
+  return util.any( self._bubblegrid[self:geth() + 1], function(k, v) return v ~= 0 end )
 end
 
 --[[ Private Functions ]]--
 
-function BubbleGrid._getwallintx( self, bubble )
+function bubblegrid_t._getwallintx( self, bubble )
   local bubblebox = bubble:getbbox()
 
   local isleftintx = bubblebox:getmin():getx() <= self._gridbox:getmin():getx()
@@ -228,13 +230,13 @@ function BubbleGrid._getwallintx( self, bubble )
   return isleftintx, isrightintx
 end
 
-function BubbleGrid._getgridintx( self, bubble )
+function bubblegrid_t._getgridintx( self, bubble )
   local bubblebbox = bubble:getbbox()
   local bubblecorners = {
     bubblebbox:getmin(),
     bubblebbox:getmax(),
-    bubblebbox:getmin() + Vector(bubblebbox:getw(), 0.0),
-    bubblebbox:getmin() + Vector(0.0, bubblebbox:geth()),
+    bubblebbox:getmin() + vector_t(bubblebbox:getw(), 0.0),
+    bubblebbox:getmin() + vector_t(0.0, bubblebbox:geth()),
   }
 
   for _, bubblecorner in ipairs( bubblecorners ) do
@@ -249,7 +251,7 @@ function BubbleGrid._getgridintx( self, bubble )
   end
 end
 
-function BubbleGrid._querycells( self, startcells, nextfxn, queryfxn )
+function bubblegrid_t._querycells( self, startcells, nextfxn, queryfxn )
   local queriedcells = {}
 
   local visitedcells, cellstotraverse = {}, startcells
@@ -273,7 +275,7 @@ function BubbleGrid._querycells( self, startcells, nextfxn, queryfxn )
   return queriedcells
 end
 
-function BubbleGrid._iteratecells( self )
+function bubblegrid_t._iteratecells( self )
   local function itercells( bubblegrid, currcellid )
     local isnextvalid = self:_iscellvalid( self:_getidcell(currcellid + 1) )
 
@@ -289,7 +291,7 @@ function BubbleGrid._iteratecells( self )
   return itercells, self, -1
 end
 
-function BubbleGrid._getadjcells( self, cellrow, cellcol )
+function bubblegrid_t._getadjcells( self, cellrow, cellcol )
   local adjcells = {}
   local cellrightdelta = self:_isrowshort( cellrow )
 
@@ -308,7 +310,7 @@ function BubbleGrid._getadjcells( self, cellrow, cellcol )
   return adjcells
 end
 
-function BubbleGrid._getadjbubbles( self, cellrow, cellcol )
+function bubblegrid_t._getadjbubbles( self, cellrow, cellcol )
   local adjbubbles = {}
 
   for _, adjcellid in ipairs( self:_getadjcells(cellrow, cellcol) ) do
@@ -323,42 +325,42 @@ function BubbleGrid._getadjbubbles( self, cellrow, cellcol )
   return adjbubbles
 end
 
-function BubbleGrid._getposcell( self, pos )
+function bubblegrid_t._getposcell( self, pos )
   local cellrow = self:geth() - math.ceil( pos:gety() ) + 1
   local cellcol = math.ceil( pos:getx() - 0.5 * self:_isrowshort(cellrow) )
 
   return cellrow, cellcol
 end
 
-function BubbleGrid._getcellpos( self, cellrow, cellcol )
+function bubblegrid_t._getcellpos( self, cellrow, cellcol )
   local cellminx = cellcol - 1 + 0.5 * self:_isrowshort( cellrow )
   local cellminy = self:geth() - cellrow
 
-  return Vector( cellminx, cellminy )
+  return vector_t( cellminx, cellminy )
 end
 
-function BubbleGrid._getcellid( self, cellrow, cellcol )
+function bubblegrid_t._getcellid( self, cellrow, cellcol )
   return ( cellcol - 1 ) + ( cellrow - 1 ) * self:getw()
 end
 
-function BubbleGrid._getidcell( self, cellid )
+function bubblegrid_t._getidcell( self, cellid )
   return math.floor( cellid / self:getw() ) + 1, ( cellid % self:getw() ) + 1
 end
 
-function BubbleGrid._iscellvalid( self, cellrow, cellcol )
+function bubblegrid_t._iscellvalid( self, cellrow, cellcol )
   local maxcellrow = self:geth()
   local maxcellcol = self:getw() - self:_isrowshort( cellrow )
 
-  return Utility.inrange( cellrow, 1, maxcellrow ) and
-    Utility.inrange( cellcol, 1, maxcellcol )
+  return util.inrange( cellrow, 1, maxcellrow ) and
+    util.inrange( cellcol, 1, maxcellcol )
 end
 
-function BubbleGrid._isrowshort( self, gridrow )
+function bubblegrid_t._isrowshort( self, gridrow )
   return ( self._rowoffset + gridrow + 1 ) % 2
 end
 
-function BubbleGrid._getseedfilename( self, gridseed )
+function bubblegrid_t._getseedfilename( self, gridseed )
   return 'boards/' .. gridseed .. '.txt'
 end
 
-return BubbleGrid
+return bubblegrid_t
