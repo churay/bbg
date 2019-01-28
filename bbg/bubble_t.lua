@@ -1,6 +1,7 @@
 local struct = require( 'bbg.struct' )
 local util = require( 'util' )
 local color = require( 'bbg.color' )
+
 local bbox_t = require( 'bbg.bbox_t' )
 local vector_t = require( 'bbg.vector_t' )
 
@@ -14,21 +15,15 @@ local DEBUGCOLOR = { 0.9, 1.0, 0.0 }
 --[[ Constructors ]]--
 
 local bubble_t = struct( {},
+  '_color', color.byname('black'),
   '_pos', vector_t(),
   '_vel', vector_t(),
-  '_color', color.byname('black'),
 )
 
-function bubble_t._init( self, ... )
-  local args = { ... }
-
-  if #args >= 3 then
-    self._pos.x, self._pos.y = args[1].x, args[1].y
-    self._vel.x, self._vel.y = args[2].x, args[2].y
-  end
-
-  local colval = args[#args] or math.random( #BUBBLECOLORS )
-  self._color = BUBBLECOLORS[colval]
+function bubble_t._init( self, coloridx, pos, vel )
+  self._color = BUBBLECOLORS[coloridx or math.random(#BUBBLECOLORS)]
+  if pos then self._pos.x, self._pos.y = args[1].x, args[1].y end
+  if vel then self._vel.x, self._vel.y = args[1].x, args[1].y end
 end
 
 --[[ Public Functions ]]--
@@ -71,5 +66,9 @@ end
 function bubble_t.getcenter( self ) return self._pos end
 function bubble_t.getvelocity( self ) return self._vel end
 function bubble_t.getcolor( self ) return self._color end
+
+--[[ Static Functions ]]--
+
+function bubble_t.getnumcolors() return #BUBBLECOLORS end
 
 return bubble_t

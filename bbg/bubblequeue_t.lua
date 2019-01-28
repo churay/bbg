@@ -1,32 +1,34 @@
-local Class = require( 'Class' )
+local struct = require( 'bbg.struct' )
 
-local Queue = require( 'Queue' )
-local Vector = require( 'Vector' )
-local Bubble = require( 'Bubble' )
-
-local BubbleQueue = Class()
+local queue_t = require( 'bbg.queue_t' )
+local vector_t = require( 'bbg.vector_t' )
+local bubble_t = require( 'bbg.bubble_t' )
 
 --[[ Constructors ]]--
 
-function BubbleQueue._init( self, pos, seed, startlength )
-  local pos = pos or Vector( 0.0, 0.0 )
+local bubblequeue_t = struct( {},
+  '_pos', vector_t(),
+  '_rng', false,
+  '_queue', queue_t(),
+)
+
+function bubblequeue_t._init( self, pos, len, seed )
+  local pos = pos or vector_t( 0.0, 0.0 )
+  local len = len or 0
   local seed = seed or os.time()
-  local startlength = startlength or 0
 
   self._pos = pos
-  self._queue = Queue()
   self._rng = love.math.newRandomGenerator( seed )
-
-  for queueidx = 1, startlength do self:enqueue() end
+  for queueidx = 1, len, 1 do self:enqueue() end
 end
 
 --[[ Public Functions ]]--
 
-function BubbleQueue.update( self, dt )
+function bubblequeue_t.update( self, dt )
   
 end
 
-function BubbleQueue.draw( self, canvas )
+function bubblequeue_t.draw( self, canvas )
   canvas.push()
   canvas.translate( self._pos:getxy() )
 
@@ -37,23 +39,23 @@ function BubbleQueue.draw( self, canvas )
   canvas.pop()
 end
 
-function BubbleQueue.enqueue( self )
+function bubblequeue_t.enqueue( self )
   -- TODO(JRC): Change this to an apply function for the sake of efficiency.
   for _, bubble in ipairs( self._queue:tolist() ) do
-    bubble._pos = bubble._pos + Vector( 1.0, 0.0 )
+    bubble._pos = bubble._pos + vector_t( 1.0, 0.0 )
   end
 
-  local newpos = Vector( 0.5, 0.5 )
-  local newbubble = Bubble( newpos, nil, self._rng:random(#Bubble.COLORS) )
+  local newpos = vector_t( 0.5, 0.5 )
+  local newbubble = bubble_t( newpos, self._rng:random(bubble_t.getnumcolors()) )
   self._queue:enqueue( newbubble )
 end
 
-function BubbleQueue.dequeue( self, doreplace )
+function bubblequeue_t.dequeue( self, doreplace )
   if doreplace or false then self:enqueue() end
   return self._queue:dequeue()
 end
 
-function BubbleQueue.dequeueall( self, doreplace )
+function bubblequeue_t.dequeueall( self, doreplace )
   local bubblequeue = {}
   for i = 1, self:length() do table.insert( bubblequeue, self:dequeue(doreplace) ) end
   return bubblequeue
@@ -61,8 +63,8 @@ end
 
 --[[ Accessor Functions ]]--
 
-function BubbleQueue.length( self ) return self._queue:length() end
+function bubblequeue_t.length( self ) return self._queue:length() end
 
 --[[ Private Functions ]]--
 
-return BubbleQueue
+return bubblequeue_t
