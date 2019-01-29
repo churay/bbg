@@ -9,7 +9,7 @@ local bubble_t = require( 'bbg.bubble_t' )
 local bubblequeue_t = struct( {},
   '_pos', vector_t(),
   '_rng', false,
-  '_queue', queue_t(),
+  '_queue', queue_t()
 )
 
 function bubblequeue_t._init( self, pos, len, seed )

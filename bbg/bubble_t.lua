@@ -17,7 +17,7 @@ local DEBUGCOLOR = { 0.9, 1.0, 0.0 }
 local bubble_t = struct( {},
   '_colorid', math.random(#BUBBLECOLORS),
   '_pos', vector_t(),
-  '_vel', vector_t(),
+  '_vel', vector_t()
 )
 
 --[[ Public Functions ]]--

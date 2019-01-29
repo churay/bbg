@@ -15,7 +15,7 @@ local bubblegrid_t = struct( {},
   '_bubblelist', {},
   '_bubblegrid', {},
   '_rowoffset', 0,
-  '_gridbox', bbox_t(),
+  '_gridbox', bbox_t()
 )
 
 function bubblegrid_t._init( self, gridseed )

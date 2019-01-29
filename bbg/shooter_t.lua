@@ -1,27 +1,26 @@
-local Class = require( 'Class' )
-local Vector = require( 'Vector' )
-local Bubble = require( 'Bubble' )
-local Utility = require( 'Utility' )
-local Shooter = Class()
+local struct = require( 'bbg.struct' )
+local util = require( 'util' )
+local color = require( 'bbg.color' )
 
-Shooter.LINECOLOR = { 0.8, 0.6, 0.2 } -- brown
+local vector_t = require( 'bbg.vector_t' )
+local bubble_t = require( 'bbg.bubble_t' )
+
+local UICOLOR = { 0.8, 0.6, 0.2 } -- brown
 
 --[[ Constructors ]]--
 
-function Shooter._init( self, pos, length, shotspeed, rotspeed )
-  self._pos = pos
-  self._length = length
-
-  self._rotdir = 0.0
-  self._shotangle = math.pi / 2.0
-
-  self._shotspeed = shotspeed or 1.0
-  self._rotspeed = rotspeed or 2.0 * math.pi / 3.0
-end
+local shooter_t = struct( {},
+  '_pos', vector_t(),
+  '_len', 0,
+  '_shotspeed', 1.0,
+  '_rotspeed', 2.0 * math.pi / 3.0,
+  '_shotangle', math.pi / 2.0,
+  '_rotdir', 0.0
+)
 
 --[[ Public Functions ]]--
 
-function Shooter.update( self, dt )
+function shooter_t.update( self, dt )
   local anglepad = math.pi / 16.0
   local rotdir = Utility.clamp( self._rotdir, -1.0, 1.0 )
 
@@ -29,24 +28,24 @@ function Shooter.update( self, dt )
   self._shotangle = Utility.clamp( newshotangle, anglepad, math.pi - anglepad )
 end
 
-function Shooter.draw( self, canvas )
+function shooter_t.draw( self, canvas )
   local gvector = ( self._length / (2.0 * self._shotspeed) ) * self:tovector()
 
   canvas.push()
   canvas.translate( self._pos:getxy() )
 
   canvas.setLineWidth( 1.0e-1 )
-  canvas.setColor( unpack(Shooter.LINECOLOR) )
+  canvas.setColor( util.unpack(UICOLOR) )
   canvas.line( -gvector:getx(), -gvector:gety(), gvector:getx(), gvector:gety() )
   canvas.pop()
 end
 
-function Shooter.rotate( self, rotdir )
+function shooter_t.rotate( self, rotdir )
   self._rotdir = self._rotdir + rotdir
 end
 
-function Shooter.tovector( self )
+function shooter_t.tovector( self )
   return self._shotspeed * Vector( math.cos(self._shotangle), math.sin(self._shotangle) )
 end
 
-return Shooter
+return shooter_t

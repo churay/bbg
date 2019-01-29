@@ -1,29 +1,35 @@
-local Class = require( 'Class' )
+local struct = require( 'bbg.struct' )
+local util = require( 'util' )
+local color = require( 'bbg.color' )
 
-local Vector = require( 'Vector' )
-local Color = require( 'Color' )
-local Box = require( 'Box' )
-local Bubble = require( 'Bubble' )
+local vector_t = require( 'bbg.vector_t' )
+local shooter_t = require( 'bbg.shooter_t' )
+local bubblequeue_t = require( 'bbg.bubblequeue_t' )
+local bubblegrid_t = require( 'bbg.bubblegrid_t' )
 
-local Shooter = require( 'Shooter' )
-local BubbleQueue = require( 'BubbleQueue' )
-local BubbleGrid = require( 'BubbleGrid' )
-local BubbleBoard = Class()
-
-BubbleBoard.BGCOLOR = Color.byname( 'white' )
-BubbleBoard.UICOLOR = Color.byname( 'black' )
+local BGCOLOR = color.byname( 'white' )
+local UICOLOR = color.byname( 'black' )
 
 --[[ Constructors ]]--
 
-function BubbleBoard._init( self, gridseed, queueseed )
+local bubbleboard_t = struct( {},
+  '_bubblegrid', false,
+  '_shooter', false,
+  '_boardqueue', false,
+  '_shooterqueue', false,
+  '_numshots', false,
+  '_nextbubble', false
+)
+
+function bubbleboard_t._init( self, gridseed, queueseed )
   local gridseed = gridseed or 0
   local queueseed = queueseed or os.time()
 
-  self._bubblegrid = BubbleGrid( gridseed )
-  self._shooter = Shooter( Vector(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
+  self._bubblegrid = bubblegrid_t( gridseed )
+  self._shooter = shooter_t( vector_t(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
 
-  self._boardqueue = BubbleQueue( Vector(0.0, 0.0), queueseed * 7, 8 )
-  self._shooterqueue = BubbleQueue( Vector(0.5, 0.5), queueseed, 2 )
+  self._boardqueue = bubblequeue_t( vector_t(0.0, 0.0), queueseed * 7, 8 )
+  self._shooterqueue = bubblequeue_t( vector_t(0.5, 0.5), queueseed, 2 )
 
   self._numshots = 0
   self._nextbubble = self:_getnextbubble()
@@ -31,7 +37,7 @@ end
 
 --[[ Public Functions ]]--
 
-function BubbleBoard.update( self, dt )
+function bubbleboard_t.update( self, dt )
   local hadmotion = self._bubblegrid:hasmotion()
 
   self._bubblegrid:update( dt )
@@ -44,7 +50,7 @@ function BubbleBoard.update( self, dt )
   end
 end
 
-function BubbleBoard.draw( self, canvas )
+function bubbleboard_t.draw( self, canvas )
   local gridheight = self._bubblegrid:geth()
   local queueheight = 2.0
 
@@ -52,7 +58,7 @@ function BubbleBoard.draw( self, canvas )
   local totalheight = gridheight + queueheight
 
   canvas.push()
-  canvas.setColor( unpack(BubbleBoard.BGCOLOR) )
+  canvas.setColor( util.unpack(BGCOLOR) )
   canvas.rectangle( 'fill', 0.0, 0.0, 1.0, 1.0 )
 
   canvas.push()
@@ -71,7 +77,7 @@ function BubbleBoard.draw( self, canvas )
 
   -- TODO(JRC): Move this logic to its own class if this ends up being the
   -- final representation for the number of shots remaining until adjustment.
-  canvas.setColor( unpack(BubbleBoard.UICOLOR) )
+  canvas.setColor( util.unpack(UICOLOR) )
   canvas.setLineWidth( 3.0e-1 )
   for shotlineidx = 1, 4 - ( self._numshots % 4 ) do
     local shotlinex = ( 3.0 / 4.0 ) * totalwidth + 0.5 * ( shotlineidx - 1 )
@@ -83,29 +89,29 @@ function BubbleBoard.draw( self, canvas )
   canvas.pop()
 end
 
-function BubbleBoard.shootbubble( self )
+function bubbleboard_t.shootbubble( self )
   -- TODO(JRC): Remove this so that multiple bubbles can be active at once.
   if self._bubblegrid:hasmotion() then return end
 
   local nextbubble = self._nextbubble
   self._nextbubble = self:_getnextbubble()
 
-  nextbubble._pos = Vector( nextbubble._pos:getx(), -nextbubble._pos:gety() )
+  nextbubble._pos = vector_t( nextbubble._pos:getx(), -nextbubble._pos:gety() )
   nextbubble._vel = self._shooter:tovector()
 
   self._bubblegrid:addbubble( nextbubble )
   self._numshots = self._numshots + 1
 end
 
-function BubbleBoard.rotateshooter( self, rotdir )
+function bubbleboard_t.rotateshooter( self, rotdir )
   self._shooter:rotate( rotdir )
 end
 
-function BubbleBoard.save( self, gridseed )
+function bubbleboard_t.save( self, gridseed )
   self._bubblegrid:savetoseed( gridseed )
 end
 
-function BubbleBoard.load( self, gridseed )
+function bubbleboard_t.load( self, gridseed )
   if not self._bubblegrid:hasmotion() then
     self._bubblegrid:loadfromseed( gridseed )
   end
@@ -113,16 +119,16 @@ end
 
 --[[ Accessor Functions ]]--
 
-function BubbleBoard.getw( self ) return self._bubblegrid:getw() end
-function BubbleBoard.geth( self ) return self._bubblegrid:geth() + 2 end
-function BubbleBoard.hasoverflow( self ) return self._bubblegrid:hasoverflow() end
+function bubbleboard_t.getw( self ) return self._bubblegrid:getw() end
+function bubbleboard_t.geth( self ) return self._bubblegrid:geth() + 2 end
+function bubbleboard_t.hasoverflow( self ) return self._bubblegrid:hasoverflow() end
 
 --[[ Private Functions ]]--
 
-function BubbleBoard._getnextbubble( self )
+function bubbleboard_t._getnextbubble( self )
   local nextbubble = self._shooterqueue:dequeue( true )
-  nextbubble._pos = Vector( self._shooter._pos:getxy() )
+  nextbubble._pos = vector_t( self._shooter._pos:getxy() )
   return nextbubble
 end
 
-return BubbleBoard
+return bubbleboard_t
