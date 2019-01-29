@@ -1,8 +1,7 @@
 local bbg = require( 'bbg' )
 love.ext = require( 'opt.loveext' )
 
--- package.path = package.path .. ';debug/?.lua'
--- ldb = require( 'debug.debugger' )
+ldb = require( 'opt.debugger' )
 
 function love.run()
   math.randomseed( os.time() )

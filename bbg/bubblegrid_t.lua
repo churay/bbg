@@ -212,8 +212,8 @@ end
 
 --[[ Accessor Functions ]]--
 
-function bubblegrid_t.getw( self ) return self._gridbox:getw() end
-function bubblegrid_t.geth( self ) return self._gridbox:geth() end
+function bubblegrid_t.getw( self ) return self._gridbox.dim.x end
+function bubblegrid_t.geth( self ) return self._gridbox.dim.y end
 function bubblegrid_t.hasmotion( self ) return #self._bubblelist > 0 end
 function bubblegrid_t.hasoverflow( self )
   return util.any( self._bubblegrid[self:geth() + 1], function(k, v) return v ~= 0 end )

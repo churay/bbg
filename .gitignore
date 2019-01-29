@@ -1,5 +1,6 @@
 ## Debugging Files ##
 debug/*
+opt/debugger.lua
 
 ## Compiled Binary Files ##
 bin/*

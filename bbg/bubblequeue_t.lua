@@ -6,6 +6,9 @@ local bubble_t = require( 'bbg.bubble_t' )
 
 --[[ Constructors ]]--
 
+-- TODO(JRC): Replace '_rng' with a callable when it is being passed
+-- to the 'bubble_t.getnextcolorid' function.
+
 local bubblequeue_t = struct( {},
   '_pos', vector_t(),
   '_rng', false,
