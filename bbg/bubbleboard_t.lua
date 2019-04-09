@@ -96,7 +96,7 @@ function bubbleboard_t.shootbubble( self )
   local nextbubble = self._nextbubble
   self._nextbubble = self:_getnextbubble()
 
-  nextbubble._pos = vector_t( nextbubble._pos:getx(), -nextbubble._pos:gety() )
+  nextbubble._pos = vector_t( nextbubble._pos.x, -nextbubble._pos.y )
   nextbubble._vel = self._shooter:tovector()
 
   self._bubblegrid:addbubble( nextbubble )

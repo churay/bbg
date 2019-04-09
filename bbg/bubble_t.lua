@@ -41,7 +41,7 @@ function bubble_t.draw( self, canvas )
 end
 
 function bubble_t.bounce( self )
-  self._vel:addip( vector_t(-2.0 * self._vel:getx(), 0.0) )
+  self._vel:addip( vector_t(-2.0 * self._vel.x, 0.0) )
 end
 
 function bubble_t.stop( self )
@@ -49,8 +49,8 @@ function bubble_t.stop( self )
 end
 
 function bubble_t.getbbox( self )
-  local minx = self._pos:getx() - 0.5
-  local miny = self._pos:gety() - 0.5
+  local minx = self._pos.x - 0.5
+  local miny = self._pos.y - 0.5
 
   return bbox_t( minx, miny, 1.0, 1.0 )
 end

@@ -15,7 +15,7 @@ local bubblegrid_t = struct( {},
   '_bubblelist', {},
   '_bubblegrid', {},
   '_rowoffset', 0,
-  '_gridbox', bbox_t()
+  '_gridbox', bbox_t(0.0, 0.0, 1.0, 1.0)
 )
 
 function bubblegrid_t._init( self, gridseed )
@@ -61,7 +61,7 @@ function bubblegrid_t.draw( self, canvas )
     -- TODO(JRC): Remove the following debugging functionality.
     local cellpos = self:_getcellpos( cellrow, cellcol )
     canvas.setColor( util.unpack(DEBUGCOLOR) )
-    canvas.rectangle( 'line', cellpos:getx(), cellpos:gety(), 1.0, 1.0 )
+    canvas.rectangle( 'line', cellpos.x, cellpos.y, 1.0, 1.0 )
   end
 
   canvas.pop()
@@ -113,14 +113,14 @@ function bubblegrid_t.popgridbubble( self, gridrow, gridcol )
     for _, adjbubbleid in ipairs( self:_getadjbubbles(r, c) ) do
       local adjrow, adjcol = self:_getidcell( adjbubbleid )
       local adjbubble = self._bubblegrid[adjrow][adjcol]
-      if popbubble:getcolor() == adjbubble:getcolor() then
+      if popbubble:getcolorid() == adjbubble:getcolorid() then
         table.insert( nextcells, adjbubbleid )
       end
     end
     return nextcells
   end
   local function popqueryfxn( r, c )
-    return popbubble:getcolor() == self._bubblegrid[r][c]:getcolor()
+    return popbubble:getcolorid() == self._bubblegrid[r][c]:getcolorid()
   end
   local bubblestopop = self:_querycells( { self:_getcellid(gridrow, gridcol) },
     popnextfxn, popqueryfxn )
@@ -173,11 +173,11 @@ function bubblegrid_t.loadfromseed( self, gridseed )
 
   if seedfile:open( 'r' ) then
     for gridline in seedfile:lines() do
-      local linebubbles = {}
-      for _, linebubble in ipairs( util.split(gridline, ' ') ) do
-        table.insert( linebubbles, tonumber(linebubble) )
+      local bubblerow = {}
+      for _, linebubble in util.iterstring( gridline, ' ' ) do
+        table.insert( bubblerow , tonumber(linebubble) )
       end
-      table.insert( self._bubblegrid, linebubbles )
+      table.insert( self._bubblegrid, bubblerow )
     end
   else
     -- TODO(JRC): Improve the random generation here.
@@ -191,8 +191,7 @@ function bubblegrid_t.loadfromseed( self, gridseed )
   end
 
   self._rowoffset = #self._bubblegrid[1] < #self._bubblegrid[2] and 1 or 0
-  self._gridbox.max.x = #self._bubblegrid[1 + self._rowoffset]
-  self._gridbox.max.y = #self._bubblegrid
+  self._gridbox:scale( #self._bubblegrid[1 + self._rowoffset], #self._bubblegrid )
 
   self._bubblegrid[0], self._bubblegrid[self:geth() + 1] = {}, {}
   for sentcol = 1, self:getw() do
@@ -224,8 +223,8 @@ end
 function bubblegrid_t._getwallintx( self, bubble )
   local bubblebox = bubble:getbbox()
 
-  local isleftintx = bubblebox:getmin():getx() <= self._gridbox:getmin():getx()
-  local isrightintx = bubblebox:getmax():getx() >= self._gridbox:getmax():getx()
+  local isleftintx = bubblebox.min.x <= self._gridbox.min.x
+  local isrightintx = bubblebox.max.x >= self._gridbox.max.x
 
   return isleftintx, isrightintx
 end
@@ -233,10 +232,10 @@ end
 function bubblegrid_t._getgridintx( self, bubble )
   local bubblebbox = bubble:getbbox()
   local bubblecorners = {
-    bubblebbox:getmin(),
-    bubblebbox:getmax(),
-    bubblebbox:getmin() + vector_t(bubblebbox:getw(), 0.0),
-    bubblebbox:getmin() + vector_t(0.0, bubblebbox:geth()),
+    bubblebbox.min,
+    bubblebbox.max,
+    bubblebbox.min + vector_t(bubblebbox.dim.x, 0.0),
+    bubblebbox.min + vector_t(0.0, bubblebbox.dim.y),
   }
 
   for _, bubblecorner in ipairs( bubblecorners ) do
@@ -326,8 +325,8 @@ function bubblegrid_t._getadjbubbles( self, cellrow, cellcol )
 end
 
 function bubblegrid_t._getposcell( self, pos )
-  local cellrow = self:geth() - math.ceil( pos:gety() ) + 1
-  local cellcol = math.ceil( pos:getx() - 0.5 * self:_isrowshort(cellrow) )
+  local cellrow = self:geth() - math.ceil( pos.y ) + 1
+  local cellcol = math.ceil( pos.x - 0.5 * self:_isrowshort(cellrow) )
 
   return cellrow, cellcol
 end
@@ -360,7 +359,7 @@ function bubblegrid_t._isrowshort( self, gridrow )
 end
 
 function bubblegrid_t._getseedfilename( self, gridseed )
-  return 'boards/' .. gridseed .. '.txt'
+  return 'data/boards/' .. gridseed .. '.txt'
 end
 
 return bubblegrid_t

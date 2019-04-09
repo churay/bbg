@@ -41,10 +41,10 @@ function renderable_t.render( self, debug )
   love.graphics.scale( self._rbox.dim:xy() )
 
   if not self._wbox then
-    local wboxx, wboxy = love.graphics.transform( 0.0, 0.0, false )
+    local wboxx, wboxy() = love.graphics.transform( 0.0, 0.0, false )
     local wboxw, wboxh = love.graphics.transform( 1.0, 1.0, true )
     -- NOTE(JRC): Adjustments for inverted Y axis in screen space.
-    self._wbox = bbox_t( wboxx, wboxy + wboxh, wboxw, -wboxh )
+    self._wbox = bbox_t( wboxx, wboxy() + wboxh, wboxw, -wboxh )
   end
 
   self:_render()
