@@ -23,8 +23,8 @@ function love.run()
     framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
     if love.update then love.update( bbg.global.fdt + math.max(-frameleft, 0) ) end
-    if love.window and love.graphics and love.window.isCreated() then
-      love.graphics.clear( bbg.colors.byname('black') )
+    if love.window and love.graphics and love.window.isOpen() then
+      love.graphics.clear( bbg.color.byname('black') )
       love.draw()
       love.graphics.present()
     end

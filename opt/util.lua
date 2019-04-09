@@ -90,6 +90,12 @@ end
 
 --[[ Table Functions ]]--
 
+function util.any( l, fcheck )
+  local b = false
+  for k, v in ipairs( l ) do b = b and fcheck( v ) end
+  return b
+end
+
 function util.map( l, fmap )
   local m = {}
   for k, v in ipairs( l ) do m[k] = fmap( v ) end

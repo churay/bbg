@@ -6,12 +6,10 @@ local bubble_t = require( 'bbg.bubble_t' )
 
 --[[ Constructors ]]--
 
--- TODO(JRC): Replace '_rng' with a callable when it is being passed
--- to the 'bubble_t.getnextcolorid' function.
-
 local bubblequeue_t = struct( {},
   '_pos', vector_t(),
   '_rng', false,
+  '_rfxn', false,
   '_queue', queue_t()
 )
 
@@ -22,6 +20,7 @@ function bubblequeue_t._init( self, pos, len, seed )
 
   self._pos = pos
   self._rng = love.math.newRandomGenerator( seed )
+  self._rfxn = function( ... ) return self._rng:random( ... ) end
   for queueidx = 1, len, 1 do self:enqueue() end
 end
 
@@ -33,7 +32,7 @@ end
 
 function bubblequeue_t.draw( self, canvas )
   canvas.push()
-  canvas.translate( self._pos:getxy() )
+  canvas.translate( self._pos:xy() )
 
   for _, bubble in ipairs( self._queue:tolist() ) do
     bubble:draw( canvas )
@@ -48,7 +47,7 @@ function bubblequeue_t.enqueue( self )
   end
 
   local newpos = vector_t( 0.5, 0.5 )
-  local newbubble = bubble_t( bubble_t.getnextcolorid(self._rng), newpos )
+  local newbubble = bubble_t( bubble_t.getnextcolorid(self._rfxn), newpos )
   self._queue:enqueue( newbubble )
 end
 

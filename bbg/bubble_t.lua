@@ -28,7 +28,7 @@ end
 
 function bubble_t.draw( self, canvas )
   canvas.push()
-  canvas.translate( self._pos:getxy() )
+  canvas.translate( self._pos:xy() )
 
   canvas.setColor( util.unpack(BUBBLECOLORS[self._colorid]) )
   canvas.circle( 'fill', 0.0, 0.0, 0.5, 20.0 )

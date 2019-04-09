@@ -22,21 +22,21 @@ local shooter_t = struct( {},
 
 function shooter_t.update( self, dt )
   local anglepad = math.pi / 16.0
-  local rotdir = Utility.clamp( self._rotdir, -1.0, 1.0 )
+  local rotdir = util.clamp( self._rotdir, -1.0, 1.0 )
 
   local newshotangle = self._shotangle + dt * rotdir * self._rotspeed
-  self._shotangle = Utility.clamp( newshotangle, anglepad, math.pi - anglepad )
+  self._shotangle = util.clamp( newshotangle, anglepad, math.pi - anglepad )
 end
 
 function shooter_t.draw( self, canvas )
-  local gvector = ( self._length / (2.0 * self._shotspeed) ) * self:tovector()
+  local gvector = ( self._len / (2.0 * self._shotspeed) ) * self:tovector()
 
   canvas.push()
-  canvas.translate( self._pos:getxy() )
+  canvas.translate( self._pos:xy() )
 
   canvas.setLineWidth( 1.0e-1 )
   canvas.setColor( util.unpack(UICOLOR) )
-  canvas.line( -gvector:getx(), -gvector:gety(), gvector:getx(), gvector:gety() )
+  canvas.line( -gvector.x, -gvector.y, gvector.x, gvector.y )
   canvas.pop()
 end
 
@@ -45,7 +45,7 @@ function shooter_t.rotate( self, rotdir )
 end
 
 function shooter_t.tovector( self )
-  return self._shotspeed * Vector( math.cos(self._shotangle), math.sin(self._shotangle) )
+  return self._shotspeed * vector_t( math.cos(self._shotangle), math.sin(self._shotangle) )
 end
 
 return shooter_t

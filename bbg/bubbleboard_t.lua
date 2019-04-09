@@ -28,8 +28,8 @@ function bubbleboard_t._init( self, gridseed, queueseed )
   self._bubblegrid = bubblegrid_t( gridseed )
   self._shooter = shooter_t( vector_t(self:getw() / 2.0, 1.0), 1.8,  10.0, math.pi / 2.0 )
 
-  self._boardqueue = bubblequeue_t( vector_t(0.0, 0.0), queueseed * 7, 8 )
-  self._shooterqueue = bubblequeue_t( vector_t(0.5, 0.5), queueseed, 2 )
+  self._boardqueue = bubblequeue_t( vector_t(0.0, 0.0), 8, queueseed * 7 )
+  self._shooterqueue = bubblequeue_t( vector_t(0.5, 0.5), 2, queueseed )
 
   self._numshots = 0
   self._nextbubble = self:_getnextbubble()
@@ -127,7 +127,7 @@ function bubbleboard_t.hasoverflow( self ) return self._bubblegrid:hasoverflow()
 
 function bubbleboard_t._getnextbubble( self )
   local nextbubble = self._shooterqueue:dequeue( true )
-  nextbubble._pos = vector_t( self._shooter._pos:getxy() )
+  nextbubble._pos = 1.0 * self._shooter._pos
   return nextbubble
 end
 
