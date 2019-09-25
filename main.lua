@@ -1,8 +1,6 @@
 local bbg = require( 'bbg' )
 love.ext = require( 'opt.loveext' )
 
-ldb = require( 'opt.debugger' )
-
 function love.run()
   math.randomseed( os.time() )
 
@@ -22,7 +20,7 @@ function love.run()
 
     framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
-    if love.update then love.update( bbg.global.fdt + math.max(-frameleft, 0) ) end
+    if love.update then love.update( bbg.config.fdt + math.max(-frameleft, 0) ) end
     if love.window and love.graphics and love.window.isOpen() then
       love.graphics.clear( bbg.color.byname('black') )
       love.draw()
@@ -31,7 +29,7 @@ function love.run()
     frameend = love.timer and love.timer.getTime() or 0
 
     if love.timer then
-      frameleft = bbg.global.fdt - ( frameend - framestart )
+      frameleft = bbg.config.fdt - ( frameend - framestart )
       if frameleft > 0 then love.timer.sleep( frameleft ) end
       love.timer.step()
     end
@@ -62,8 +60,8 @@ function love.keyreleased( key, scancode )
 end
 
 function love.update( dt )
-  bbg.global.fnum = bbg.global.fnum + 1
-  bbg.global.avgfps = 1 / dt
+  bbg.meta.fcount = bbg.meta.fcount + 1
+  bbg.meta.avgfps = 1 / dt
 
   board:update( dt )
   -- TODO(JRC): Figure out a better way to handle the board reset behavior here.

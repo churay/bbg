@@ -3,18 +3,15 @@ local bbg = util.libload( 'bbg' )
 
 -- NOTE(JRC): If any of the reserved variable tables are overloaded with
 -- a module name, then this module should fail to load.
-if bbg.global ~= nil or bbg.model ~= nil or bbg.view ~= nil or bbg.input ~= nil then
+if bbg.meta ~= nil or bbg.model ~= nil or bbg.view ~= nil or bbg.input ~= nil then
   return nil
 end
 
---[[ Global Values ]]--
+--[[ Meta Values ]]--
 
-bbg.global = {}
-bbg.global.debug = true
-bbg.global.fnum = 1
-bbg.global.fps = 60.0
-bbg.global.avgfps = 0.0
-bbg.global.fdt = 1 / bbg.global.fps
+bbg.meta = {}
+bbg.meta.fcount = 0.0
+bbg.meta.avgfps = 0.0
 
 --[[ Model Values ]]--
 

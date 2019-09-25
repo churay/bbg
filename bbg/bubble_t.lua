@@ -1,5 +1,6 @@
 local struct = require( 'bbg.struct' )
 local util = require( 'util' )
+local config = require( 'bbg.config' )
 local color = require( 'bbg.color' )
 
 local bbox_t = require( 'bbg.bbox_t' )
@@ -33,10 +34,11 @@ function bubble_t.draw( self, canvas )
   canvas.setColor( util.unpack(BUBBLECOLORS[self._colorid]) )
   canvas.circle( 'fill', 0.0, 0.0, 0.5, 20.0 )
 
-  -- TODO(JRC): Only enable this functionality when the debug flag
-  -- is enabled.
-  canvas.setColor( util.unpack(DEBUGCOLOR) )
-  canvas.rectangle( 'line', -0.5, -0.5, 1.0, 1.0 )
+  if config.debug then
+    canvas.setColor( util.unpack(DEBUGCOLOR) )
+    canvas.rectangle( 'line', -0.5, -0.5, 1.0, 1.0 )
+  end
+
   canvas.pop()
 end
 

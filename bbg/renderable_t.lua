@@ -1,6 +1,7 @@
 local bbox_t = require( 'bbg.bbox_t' )
 local vector_t = require( 'bbg.vector_t' )
 local struct = require( 'bbg.struct' )
+local config = require( 'bbg.config' )
 local colors = require( 'bbg.colors' )
 
 --[[ Constructor ]]--
@@ -33,9 +34,7 @@ function renderable_t.remlayer( self, layeridx )
   return layer
 end
 
-function renderable_t.render( self, debug )
-  local debug = debug or false
-
+function renderable_t.render( self )
   love.graphics.push()
   love.graphics.translate( self._rbox.min:xy() )
   love.graphics.scale( self._rbox.dim:xy() )
@@ -48,11 +47,11 @@ function renderable_t.render( self, debug )
   end
 
   self:_render()
-  for _, layer in ipairs( self._rlayers ) do layer:render( debug ) end
+  for _, layer in ipairs( self._rlayers ) do layer:render() end
 
   -- TODO(JRC): Set different colors based on the canvas in order to avoid
   -- ambiguity in debug bounding box renders.
-  if debug then
+  if config.debug then
     love.graphics.setLineWidth( 0.01 )
     love.graphics.setColor( colors.tuple('magenta') )
     love.graphics.polygon( 'line', 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 )

@@ -1,5 +1,6 @@
 local struct = require( 'bbg.struct' )
 local util = require( 'util' )
+local config = require( 'bbg.config' )
 local color = require( 'bbg.color' )
 
 local vector_t = require( 'bbg.vector_t' )
@@ -58,10 +59,11 @@ function bubblegrid_t.draw( self, canvas )
   for _, cellrow, cellcol, bubble in self:_iteratecells() do
     if bubble ~= 0 then bubble:draw( canvas ) end
 
-    -- TODO(JRC): Remove the following debugging functionality.
-    local cellpos = self:_getcellpos( cellrow, cellcol )
-    canvas.setColor( util.unpack(DEBUGCOLOR) )
-    canvas.rectangle( 'line', cellpos.x, cellpos.y, 1.0, 1.0 )
+    if config.debug then
+      local cellpos = self:_getcellpos( cellrow, cellcol )
+      canvas.setColor( util.unpack(DEBUGCOLOR) )
+      canvas.rectangle( 'line', cellpos.x, cellpos.y, 1.0, 1.0 )
+    end
   end
 
   canvas.pop()
@@ -163,8 +165,9 @@ function bubblegrid_t.savetoseed( self, gridseed )
     end
   end
 
-  -- TODO(JRC): Remove this once debugging is completed!
-  print( 'Saved grid to seed file ' .. seedfilename )
+  if config.debug then
+    print( 'Saved grid to seed file ' .. seedfilename )
+  end
 end
 
 function bubblegrid_t.loadfromseed( self, gridseed )
@@ -205,8 +208,9 @@ function bubblegrid_t.loadfromseed( self, gridseed )
     end
   end
 
-  -- TODO(JRC): Remove this once debugging is completed!
-  print( 'Loaded grid from seed file ' .. seedfilename )
+  if config.debug then
+    print( 'Loaded grid from seed file ' .. seedfilename )
+  end
 end
 
 --[[ Accessor Functions ]]--
