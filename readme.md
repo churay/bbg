@@ -5,6 +5,10 @@ written in Lua with [LÖVE](https://love2d.org/). This prototype is meant to
 imitate the base game rules found in the [Puzzle Bobble/Bust-a-Move series]
 (https://en.wikipedia.org/wiki/Puzzle_Bobble).
 
+## Demo ##
+
+!['bbg' demo](https://github.com/churay/bbg/raw/master/doc/demo.gif)
+
 ## Install ##
 
 If you're running on an Ubuntu flavor of Linux, you can install all of this
